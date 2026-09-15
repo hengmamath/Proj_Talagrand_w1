@@ -1,0 +1,903 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=28mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks=true,linkcolor=MidnightBlue,citecolor=ForestGreen,urlcolor=MidnightBlue]{hyperref}
+\hypersetup{pdftitle={Variational observables of log-correlated fields: a research plan for critical L1 transport}}
+\setlist[enumerate]{itemsep=4pt,topsep=5pt}
+\setlist[itemize]{itemsep=3pt,topsep=5pt}
+\setlength{\emergencystretch}{2em}
+\newtheorem{proposition}{Proposition}[section]
+\theoremstyle{definition}
+\newtheorem{target}[proposition]{Research target}
+\newtheorem{remark}[proposition]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\E}{\mathbb E}
+\newcommand{\T}{\mathbb T}
+\newcommand{\Lip}{\operatorname{Lip}}
+\newcommand{\diver}{\operatorname{div}}
+\newcommand{\curl}{\operatorname{curl}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\KR}{\mathrm{KR}}
+\newcommand{\cF}{\mathcal F}
+\newcommand{\cM}{\mathcal M}
+\newcommand{\PL}{P_{\mathrm L}}
+\newcommand{\PT}{P_{\mathrm T}}
+\newcommand{\dd}{\,dx}
+
+\title{Variational Observables of Log-Correlated Fields\\[4pt]
+\large A Research Plan for Critical $L^1$ Transport}
+\author{Research plan notes}
+\date{14 September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The proposed program studies the least total flux needed to realize the
+divergence of a regularized log-correlated vector field. Its basic observable is
+$\inf_{\diver K=0}\int|J_\varepsilon+K|$, normalized by
+$\sqrt{\log(1/\varepsilon)}$. A Gaussian limit theorem for this observable,
+together with quantitative approximation in the transport norm and control
+of the boundary, would yield the limiting constant in Talagrand's
+two-dimensional empirical $W_1$ problem. The relevant universality class is
+determined by the longitudinal covariance of the field and by the transport
+cost; logarithmic pointwise variance alone does not specify it. We formulate
+concrete targets, give the exact normalization linking them to empirical
+transport, and explain examples involving vector Gaussian free fields,
+membrane slopes, random charge distributions, and network flows. We also
+identify which connections to screening, stochastic homogenization, and
+critical empirical processes are substantive, and which require additional
+theorems. The statements labeled research targets are proposals, while the
+elementary identities and conditional reductions are justified below.
+\end{abstract}
+
+\section{The question and the proposed generalization}
+\label{sec:aim}
+
+These notes develop the variational generalization proposed in the
+discussion ``Prove Limit Existence.'' The hypotheses, conditional
+reductions, and field examples below make that proposal precise.
+
+Let $Q=[0,1]^2$, let $\lambda$ be Lebesgue probability measure on $Q$, and
+let $X_1,X_2,\ldots$ be independent with law $\lambda$. Write
+\[
+  \mu_N=\frac1N\sum_{i=1}^N\delta_{X_i},\qquad
+  A_N=\E\sup_{\Lip(f)\leq1}
+  \left|\sum_{i=1}^N\left(f(X_i)-\int_Q f\dd\right)\right|.
+\]
+The critical order is $A_N\asymp\sqrt{N\log N}$. The question is whether
+\begin{equation}\label{eq:talagrand}
+  \frac{A_N}{\sqrt{N\log N}}
+  =\sqrt{\frac N{\log N}}\,\E W_1(\mu_N,\lambda)
+  \longrightarrow c_*\in(0,\infty).
+\end{equation}
+Talagrand explicitly formulates the limit problem in
+\cite[Research Problem 4.5.4]{Talagrand}. The cited quadratic matching theory
+\cite{AST} and the convergence results in dimensions $d\geq3$ \cite{GT}
+give useful precedents. They do not provide the two-dimensional $p=1$
+conclusion needed here. The nonlinear PDE reduction of \cite{AVT} concerns
+strictly convex power costs $p>1$ and also distinguishes reduction to a
+random PDE from existence of the asymptotic constant. These notes retain
+\eqref{eq:talagrand} as a research target; the cited literature is the basis
+for the program, rather than a claim of an exhaustive status survey.
+
+The broader question suggested by the discussion is the following. Given
+a smooth cutoff $J_\varepsilon$ of a random vector distribution on a domain
+$D$, study
+\begin{equation}\label{eq:informal}
+  \cF_D(J_\varepsilon)
+  :=\inf_{\diver K=0}\int_D|J_\varepsilon+K|\dd,
+  \qquad
+  \frac{\cF_D(J_\varepsilon)}{\sqrt{\log(1/\varepsilon)}}.
+\end{equation}
+The constraint on $K$ preserves sources and sinks while allowing the flux
+to be rerouted. A boundary condition and a relaxed interpretation of the
+integral are part of the definition, as specified next. The hoped-for
+output is a deterministic limiting cost, together with an effective
+description of the rerouting. This is a variational observable of a random
+field, distinct from its maximum, its level sets, or an exponential measure.
+
+\section{The exact transport dictionary}
+\label{sec:dictionary}
+
+\subsection{Balanced sources and fluxes}
+For a finite signed measure $\sigma$ on a compact convex domain $D$, with
+$\sigma(D)=0$, set
+\[
+  \|\sigma\|_{\KR(D)}
+  =\sup_{\Lip(f)\leq1}\langle\sigma,f\rangle.
+\]
+The absolute value can be included without changing this supremum. When
+$\sigma=\mu-\nu$ for probability measures, this equals $W_1(\mu,\nu)$.
+The Beckmann formulation is
+\begin{equation}\label{eq:beckmann}
+  \|\sigma\|_{\KR(D)}
+  =\inf\bigl\{|J|(\overline D):
+       J\in\cM(\overline D;\R^2),\ -\diver J=\sigma,
+       \ J\cdot n=0\bigr\}.
+\end{equation}
+Here the divergence and no-flux condition are imposed together by
+\begin{equation}\label{eq:weakboundary}
+  \int_{\overline D}\nabla f\cdot dJ=\int_{\overline D}f\,d\sigma
+  \quad\text{for every }f\in C^1(\overline D).
+\end{equation}
+Thus no unmentioned boundary reservoir is allowed. Formula
+\eqref{eq:beckmann} follows from transport duality and the minimal-flow
+formulation; see \cite[Sections 3.1 and 4.2]{Santambrogio}. Convexity ensures
+that the distance inside $D$ agrees with Euclidean distance. On a flat
+torus we instead use periodic test functions and the torus distance.
+
+If $J=J^a dx+J^s$, its cost is
+$\int_D|J^a|\dd+|J^s|(\overline D)$. This relaxation accommodates atomic
+sources and possible concentration of minimizing fluxes. We use the
+same relaxation in \eqref{eq:informal}: $J_\varepsilon$ denotes a density,
+and the actual cost is $|J_\varepsilon dx+K|(\overline D)$. For a norm
+$\Phi$ on $\R^2$, write more generally
+\[
+  \|J\|_\Phi
+  =\int_{\overline D}\Phi\!\left(\frac{dJ}{d|J|}\right)d|J|,
+  \qquad
+  \cF_D^\Phi(J_0)=\inf_{\diver K=0}\|J_0dx+K\|_\Phi.
+\]
+On a domain, $J_0$ and admissible $K$ also have zero normal flux. If
+$\Phi^\circ$ is the dual norm, the dual constraint is
+$\Phi^\circ(\nabla f)\leq1$. We write $\cF_D$ for $\Phi(v)=|v|$.
+
+\subsection{Empirical fluctuations and the sign convention}
+Define the balanced empirical fluctuation
+\[
+  \xi_N=\sqrt N(\mu_N-\lambda).
+\]
+Then, exactly,
+\begin{equation}\label{eq:empiricalexact}
+  \|\xi_N\|_{\KR(Q)}=\sqrt N\,W_1(\mu_N,\lambda),
+  \qquad
+  \frac{A_N}{\sqrt{N\log N}}
+  =\frac{\E\|\xi_N\|_{\KR(Q)}}{\sqrt{\log N}}.
+\end{equation}
+Throughout, the sign convention is $-\diver J=\sigma$. Consequently,
+if $-\Delta u=\sigma$ with Neumann boundary condition, the reference flux
+is $J_0=\nabla u$, and every admissible flux is $J_0+K$ with
+$\diver K=0$ and $K\cdot n=0$.
+
+For fixed smooth test functions, the Gaussian limit of $\xi_N$ has
+covariance
+\begin{equation}\label{eq:bridge}
+  \E\langle\xi,f\rangle\langle\xi,g\rangle
+  =\int_Qfg\dd-\int_Qf\dd\int_Qg\dd.
+\end{equation}
+It is white noise with its constant mode removed: the spatial analogue
+of a Brownian bridge. This finite-dimensional central limit statement
+does not by itself control the growing supremum in
+\eqref{eq:empiricalexact}. Section~\ref{sec:transfer} states the stronger
+comparison that would suffice.
+
+\section{Why the reference flux is log-correlated}
+\label{sec:gaussian}
+
+First work on the unit torus $\T^2=\R^2/\Z^2$ with volume one. Use Fourier
+frequencies $k\in2\pi\Z^2$ and omit $k=0$. Let $\xi$ be mean-zero white
+noise, let $\chi(r)=e^{-r^2/2}$, and define
+\begin{equation}\label{eq:reference}
+  \xi_\varepsilon=\chi(\varepsilon\sqrt{-\Delta})\xi,
+  \qquad J_\varepsilon=\nabla(-\Delta)^{-1}\xi_\varepsilon.
+\end{equation}
+Its Fourier covariance is
+\begin{equation}\label{eq:fourier}
+  \E\bigl[\widehat J_\varepsilon(k)
+      \widehat J_\varepsilon(k)^*\bigr]
+  =\chi(\varepsilon|k|)^2\frac{k\otimes k}{|k|^4}.
+\end{equation}
+In particular, with $t_\varepsilon=\log(1/\varepsilon)$,
+\begin{align}\label{eq:variance}
+  \Cov(J_\varepsilon(x))
+  &=\sum_{k\ne0}\chi(\varepsilon|k|)^2
+        \frac{k\otimes k}{|k|^4}
+    =\frac{t_\varepsilon}{4\pi}I_2+O(1).
+\end{align}
+The coefficient comes from the annular integral
+\[
+  \frac1{(2\pi)^2}\int_1^{1/\varepsilon}\frac{dr}{r}
+            \int_{S^1}\theta\otimes\theta\,d\theta
+  =\frac{\log(1/\varepsilon)}{4\pi}I_2.
+\]
+Replacing the lattice sum by this integral has bounded error: away from
+the origin the derivative of the homogeneous summand is $O(|k|^{-3})$,
+which is summable over unit cells in two dimensions; the smooth cutoff
+adds a bounded error. The same Fourier kernel gives, at short separations,
+\[
+  \E[J_{\varepsilon,i}(x)J_{\varepsilon,j}(y)]
+  =\frac{\delta_{ij}}{4\pi}
+      \log\frac1{|x-y|\vee\varepsilon}+O(1),
+\]
+where the bounded remainder includes angular dependence. Thus
+$O(t_\varepsilon)$ frequency annuli each contribute order-one variance.
+This is the logarithmic scaling mechanism discussed in the general
+Gaussian-field literature \cite{DRSV,LSSW}.
+
+There is an explicit benchmark for the cost of the reference flux.
+Stationarity, Gaussianity, and \eqref{eq:variance} imply
+\begin{equation}\label{eq:linearbenchmark}
+  \frac{\E\int_{\T^2}|J_\varepsilon|\dd}{\sqrt{t_\varepsilon}}
+  \longrightarrow
+  \E|Z|=\frac1{2\sqrt2},
+  \qquad Z\sim N\!\left(0,\frac1{4\pi}I_2\right).
+\end{equation}
+Indeed, the expected radius of a two-dimensional standard Gaussian is
+$\sqrt{\pi/2}$. The normalized Gaussian second moments are bounded, so
+convergence in law also gives convergence of these first moments.
+Taking $K=0$ yields the rigorous upper benchmark
+\begin{equation}\label{eq:upper}
+  \limsup_{\varepsilon\downarrow0}
+  \frac{\E\cF_{\T^2}(J_\varepsilon)}{\sqrt{t_\varepsilon}}
+  \leq\frac1{2\sqrt2}.
+\end{equation}
+
+The optimization remains essential. For $L^2$ fluxes, orthogonality gives
+\[
+  \int|\nabla u+K|^2
+  =\int|\nabla u|^2+\int|K|^2
+  \quad(\diver K=0),
+\]
+with periodic or compatible no-flux boundary conditions. There is no
+such identity for $L^1$. Where $J_0\ne0$, a necessary stationarity
+condition for a smooth $L^1$ minimizer is
+\[
+  \int\frac{J_0}{|J_0|}\cdot K\dd=0
+  \quad\text{for all admissible solenoidal }K.
+\]
+Although $J_0=\nabla u$ is a gradient, $\nabla u/|\nabla u|$ generally is
+not. Hence the Poisson flux need not minimize the cost. Whether the
+reduction below \eqref{eq:linearbenchmark} survives at leading order is
+one of the main structural questions.
+
+\section{A precise class of general log-correlated vector fields}
+\label{sec:general}
+
+\subsection{The longitudinal covariance is the relevant datum}
+Let $H_\varepsilon$ be a real, centered, stationary Gaussian vector field
+on $\T^2$, with independent Fourier modes subject to the reality
+constraint, and covariance
+\begin{equation}\label{eq:generalcov}
+  \E[\widehat H_\varepsilon(k)\widehat H_\varepsilon(k)^*]
+  =\chi(\varepsilon|k|)^2\frac{A(k/|k|)}{|k|^2},
+  \qquad k\ne0.
+\end{equation}
+Initially assume that $A$ is a smooth, even, real symmetric,
+nonnegative matrix-valued function on $S^1$. Define
+\[
+  \PL(k)=\frac{k\otimes k}{|k|^2},\qquad
+  \PT(k)=I_2-\PL(k),\qquad
+  a(\theta)=\theta^TA(\theta)\theta.
+\]
+Every nonzero Fourier mode of $\PT H_\varepsilon$ is divergence-free.
+Constant vector fields are divergence-free as well and are included in
+the admissible corrections. Therefore
+\begin{equation}\label{eq:quotient}
+  \cF_{\T^2}^\Phi(H_\varepsilon)
+  =\cF_{\T^2}^\Phi(\PL H_\varepsilon)
+  =\| -\diver H_\varepsilon\|_{\KR,\Phi},
+\end{equation}
+where the last norm has dual constraint $\Phi^\circ(\nabla f)\leq1$.
+The source $-\diver H_\varepsilon$ has Fourier variance
+$\chi(\varepsilon|k|)^2a(k/|k|)$. Thus the full angular function $a$, rather
+than the entire matrix $A$, determines the law of this observable.
+
+\begin{remark}[Why logarithmic covariance alone is insufficient]
+Let $R(v_1,v_2)=(-v_2,v_1)$. The field $RJ_\varepsilon$ is divergence-free,
+so $\cF_{\T^2}(RJ_\varepsilon)=0$ identically. Nevertheless, it has the
+same leading pointwise covariance $I_2t_\varepsilon/(4\pi)$ as
+$J_\varepsilon$, and the same isotropic leading logarithmic singularity
+in its covariance kernel. The angular part of the spectral covariance
+distinguishes them. A positive universal limit for all fields having
+only that logarithmic singularity would therefore be false.
+\end{remark}
+
+\begin{target}[Gaussian variational limit]\label{target:gaussian}
+For every smooth even $a:S^1\to(0,\infty)$ with
+$0<a_-\leq a\leq a_+<\infty$, and every norm $\Phi$ on $\R^2$, prove that
+\begin{equation}\label{eq:gaussiantarget}
+  \frac{\E\cF_{\T^2}^\Phi(H_\varepsilon)}{\sqrt{t_\varepsilon}}
+  \longrightarrow\kappa(a,\Phi)\in(0,\infty).
+\end{equation}
+Prove independence of the limit from a specified class of smooth radial
+cutoffs that equal one at zero and decay rapidly at infinity.
+\end{target}
+The first case to attack is $a\equiv1$, $\Phi=|\cdot|$; denote its
+constant, if it exists, by $\kappa$. The general formulation isolates
+anisotropic noise and anisotropic transport costs without assuming that
+they give the same constant. Homogeneity forces
+\[
+  \kappa(s^2a,\Phi)=s\kappa(a,\Phi),\qquad
+  \kappa(a,b\Phi)=b\kappa(a,\Phi)\quad(s,b>0).
+\]
+Strict positivity is part of the target. The upper bound follows directly
+from the reference flux, while a lower bound must respect the global
+gradient constraint in the dual problem.
+
+\subsection{Stability and the mode of convergence}
+Two elementary estimates help delimit the genuinely difficult part.
+For fields on the same domain with the same boundary convention,
+\begin{equation}\label{eq:stability}
+  |\cF_D^\Phi(H)-\cF_D^\Phi(\widetilde H)|
+  \leq\cF_D^\Phi(H-\widetilde H)
+  \leq C_\Phi\int_D|H-\widetilde H|\dd.
+\end{equation}
+Consequently, a coupling with expected $L^1$ error
+$o(\sqrt{t_\varepsilon})$ transfers the leading constant. In particular,
+standard smooth cutoffs of the same Gaussian Fourier series have
+bounded expected $L^1$ difference: their difference has variance
+controlled by
+\[
+  C\int_1^\infty
+       |\chi_1(\varepsilon r)-\chi_2(\varepsilon r)|^2\frac{dr}{r}
+  \leq C'.
+\]
+This proves cutoff stability once existence is known. A bounded
+pointwise difference of covariance kernels alone is not the coupling
+estimate in \eqref{eq:stability}.
+
+For the Gaussian source with bounded spectral density $a$, the variance
+of the optimized cost is uniformly bounded:
+\begin{equation}\label{eq:concentration}
+  \Var\bigl(\cF_{\T^2}^\Phi(H_\varepsilon)\bigr)\leq C(a_+,\Phi).
+\end{equation}
+To see this, represent the source as a bounded Fourier multiplier of
+white noise. Its dual cost is a supremum of Gaussian linear functionals
+indexed by mean-zero $f$ with $\Phi^\circ(\nabla f)\leq1$.
+Poincare's inequality bounds $\|f\|_2$ uniformly. This makes the
+supremum uniformly Lipschitz in the underlying Gaussian coordinates;
+the Gaussian Poincare inequality gives \eqref{eq:concentration}, first
+for finitely many modes and then by approximation. Thus convergence of
+the expectations in \eqref{eq:gaussiantarget} would automatically give
+convergence in $L^2$ and in probability after normalization. It does not
+follow from concentration that the normalized expectations converge.
+
+\section{How a Gaussian theorem would imply Talagrand's limit}
+\label{sec:transfer}
+
+Return to $Q$ and use the Neumann heat semigroup $P_t$. Let
+$S_\varepsilon=P_{\varepsilon^2/2}$, let $\xi$ have covariance
+\eqref{eq:bridge}, and put
+\[
+  J_\varepsilon^Q
+  =\nabla(-\Delta_{\mathrm N})^{-1}S_\varepsilon\xi,
+  \qquad
+  B_\varepsilon^Q
+  =\cF_Q(J_\varepsilon^Q)
+  =\|S_\varepsilon\xi\|_{\KR(Q)}.
+\]
+The inverse is on the mean-zero subspace. The no-flux condition is built
+into this construction.
+
+\begin{proposition}[A conditional transfer criterion]\label{prop:transfer}
+Suppose that
+\begin{equation}\label{eq:squarelimit}
+  \frac{\E B_\varepsilon^Q}{\sqrt{\log(1/\varepsilon)}}
+  \longrightarrow\kappa_Q\in(0,\infty).
+\end{equation}
+Suppose there are $\varepsilon_N\downarrow0$ such that
+\begin{equation}\label{eq:scales}
+  \frac{\log(1/\varepsilon_N)}{\log N}\longrightarrow\frac12,
+  \qquad
+  \sqrt N\,\varepsilon_N=o(\sqrt{\log N}),
+\end{equation}
+and couplings of $\xi_N$ and a field $\xi$ of law \eqref{eq:bridge} with
+\begin{equation}\label{eq:couplingtarget}
+  \E\|S_{\varepsilon_N}\xi_N-S_{\varepsilon_N}\xi\|_{\KR(Q)}
+  =o(\sqrt{\log N}).
+\end{equation}
+Then \eqref{eq:talagrand} holds with $c_*=\kappa_Q/\sqrt2$.
+\end{proposition}
+
+\begin{proof}
+Reflected Brownian motion on the square has expected displacement at
+time $\varepsilon^2/2$ bounded by $C\varepsilon$, uniformly in its
+starting point. Coupling a point to its heat evolution gives
+$W_1(\nu,S_\varepsilon\nu)\leq C\varepsilon$ for every probability
+measure $\nu$. Since $S_\varepsilon\lambda=\lambda$,
+\[
+  \|\xi_N-S_\varepsilon\xi_N\|_{\KR(Q)}
+  \leq C\sqrt N\,\varepsilon.
+\]
+The triangle inequality and \eqref{eq:couplingtarget} therefore imply
+\[
+  \left|\E\|\xi_N\|_{\KR(Q)}-\E B_{\varepsilon_N}^Q\right|
+  =o(\sqrt{\log N}).
+\]
+Now use \eqref{eq:squarelimit}, \eqref{eq:scales}, and
+\eqref{eq:empiricalexact}.
+\end{proof}
+
+A useful scale to test is
+\begin{equation}\label{eq:mesoscale}
+  \varepsilon_N=N^{-1/2}(\log N)^\beta,
+  \qquad 0<\beta<\frac12.
+\end{equation}
+The expected number of sample points in a cell of that size is
+$N\varepsilon_N^2=(\log N)^{2\beta}\to\infty$, while the smoothing error
+is negligible at the target scale. This leaves room for a cellwise
+Gaussian approximation without discarding a positive fraction of the
+logarithmic scales. The coupling in \eqref{eq:couplingtarget} remains a
+quantitative task; a central limit theorem for each fixed test function
+does not prove it.
+
+One possible route is to Poissonize the cell counts, couple each
+centered count to a Gaussian, balance the resulting residual, and bound
+its transport cost through an inverse-divergence estimate. For a smooth
+mean-zero residual $r$,
+\begin{equation}\label{eq:hminusone}
+  \|r\|_{\KR(Q)}
+  \leq\|\nabla(-\Delta_{\mathrm N})^{-1}r\|_{L^1(Q)}
+  \leq\|r\|_{H^{-1}_{\mathrm N}(Q)}.
+\end{equation}
+The last norm is defined by the displayed Neumann gradient in $L^2$.
+Cellwise residuals must be spread over cells or smoothed before this
+estimate is used: point charges in dimension two do not have finite
+$H^{-1}$ norm. The errors from cell placement, Gaussian coupling,
+balancing, and removal of Poissonization must all satisfy the same
+$o(\sqrt{\log N})$ budget.
+
+There is a separate geometric step. A theorem on $\T^2$ does not
+automatically imply \eqref{eq:squarelimit}; periodic and no-flux
+admissible classes differ. A boundary comparison must prove
+$\kappa_Q=\kappa$. With that comparison and
+Proposition~\ref{prop:transfer}, the constants are related by
+\begin{equation}\label{eq:constants}
+  c_*=\frac\kappa{\sqrt2},\qquad
+  \kappa\leq\frac1{2\sqrt2},\qquad c_*\leq\frac14.
+\end{equation}
+The last inequality is the consequence of these transfer inputs and the
+explicit Gaussian benchmark; equality is a further question about the
+optimal solenoidal correction.
+
+\section{Concrete fields and their mathematical or physical meaning}
+\label{sec:examples}
+
+\subsection{Two independent GFFs: an exact Gaussian identification}
+Let $h_1,h_2$ be independent mean-zero Gaussian free fields on $\T^2$,
+each with covariance operator $(-\Delta)^{-1}$, and set
+$H_\varepsilon=(S_\varepsilon h_1,S_\varepsilon h_2)$. Then
+\[
+  \E[\widehat H_\varepsilon(k)\widehat H_\varepsilon(k)^*]
+  =\chi(\varepsilon|k|)^2\frac{I_2}{|k|^2}.
+\]
+Its longitudinal projection has covariance
+$\chi(\varepsilon|k|)^2(k\otimes k)/|k|^4$. Hence, as Gaussian fields,
+\begin{equation}\label{eq:vectorgff}
+  \PL H_\varepsilon\ \stackrel{\mathrm{law}}=\ J_\varepsilon,
+  \qquad
+  \cF_{\T^2}(H_\varepsilon)
+     \ \stackrel{\mathrm{law}}=\ \cF_{\T^2}(J_\varepsilon).
+\end{equation}
+This supplies a concrete observable of a familiar free field with
+exactly the same Gaussian variational problem. In the free-field
+interpretation, the two components have quadratic gradient energy
+$\frac12\int(|\nabla h_1|^2+|\nabla h_2|^2)$, understood with a cutoff.
+The proposed observable measures the least total vector amplitude
+compatible with the field's sources and sinks. Its value forgets the
+transverse component, even though that component contributes to the
+ordinary $L^1$ norm. This is a precise connection to GFF theory, but it
+does not yet produce a statement about GFF extremes or multiplicative
+chaos.
+
+\subsection{Membrane slopes: the reference field itself}
+Let
+\[
+  u=(-\Delta)^{-1}\xi,
+  \qquad \Cov(u)=(-\Delta)^{-2}.
+\]
+This is the mean-zero bi-Laplacian Gaussian field. Its discrete
+counterpart is the Gaussian membrane model \cite{LSSW}. At a spectral
+cutoff it has the quadratic bending Hamiltonian
+\begin{equation}\label{eq:membrane}
+  \mathcal H(u)=\frac12\int_{\T^2}(\Delta u)^2\dd,
+  \qquad J_\varepsilon=\nabla u_\varepsilon.
+\end{equation}
+In the small-slope approximation to a tensionless membrane, $u$ is a
+height and $\nabla u$ is its slope. In dimension two, it is this slope
+field that is log-correlated. The height is not the ordinary
+two-dimensional GFF. In dimension four the bi-Laplacian height itself
+is log-correlated, which is a different instance of the fractional
+Gaussian-field family.
+
+The functional $\cF(\nabla u_\varepsilon)$ asks how much of the integrated
+slope magnitude remains after arbitrary divergence-free corrections
+while retaining $-\Delta u_\varepsilon$. This is a mathematically natural
+nonlinear observable of membrane slopes. Such corrections need not be
+gradients of another height, so the optimization is not itself the
+physical bending energy or a membrane equilibrium principle. A useful
+result would quantify the difference between unconstrained slope
+amplitude and the amplitude forced by the curvature source.
+
+\subsection{Random charges: an \texorpdfstring{$L^1$}{L1} counterpart of electrostatics}
+For a smooth neutral charge density $\rho_\varepsilon$, let
+$-\Delta V_\varepsilon=\rho_\varepsilon$. The electrostatic field
+$E_\varepsilon=-\nabla V_\varepsilon$ satisfies
+$\diver E_\varepsilon=\rho_\varepsilon$. Our reference flux is
+$J_\varepsilon=-E_\varepsilon$. In the quadratic variational principle,
+the gradient field minimizes $\frac12\int|E|^2$ among fields with that
+divergence. The corresponding linear-growth problem is
+\begin{equation}\label{eq:charge}
+  \inf_{\diver E=\rho_\varepsilon}\int|E|\dd
+  =\|\rho_\varepsilon\|_{\KR}.
+\end{equation}
+For an ordinary signed density this is exactly the transport cost from
+its positive part to its negative part, which have equal total mass.
+It measures the work needed to neutralize the charge with unit cost per
+unit mass and distance.
+
+This distinction gives a concrete purpose to screening estimates:
+neutralize charge locally, match the remaining boundary fluxes, and
+bound the extra transport required to join neighboring regions. The
+charge is prescribed in \eqref{eq:charge}; no additional Coulomb-gas
+Gibbs weight is implicit.
+
+The spectral density also explains why Coulomb systems should not all
+be placed in the white-noise universality class. In a large box of side
+$L$, with a fixed microscopic cutoff, a stationary isotropic charge
+field of structure factor $S(k)$ has a linear-field variance contribution
+proportional to
+\begin{equation}\label{eq:structurefactor}
+  \int_{1/L}^{1}\frac{S(r)}r\,dr.
+\end{equation}
+If $S(r)\to S_0>0$, this is $S_0\log L+o(\log L)$. If instead
+$S(r)=O(r^\alpha)$ with $\alpha>0$, this contribution stays bounded.
+The latter behavior is associated with hyperuniform suppression of
+long-wavelength density fluctuations \cite{TS}. Formula
+\eqref{eq:structurefactor} is a diagnostic for the linear flux, not a
+complete asymptotic theorem for the optimized cost. It identifies
+screened charge systems as tests of where the critical normalization
+changes.
+
+\subsection{Random network flows and non-Gaussian noise}
+On a finite connected graph with oriented incidence matrix $B$, neutral
+charges $\eta=(\eta_v)$, and positive edge lengths $\ell_e$, the exact
+finite-dimensional analogue is
+\begin{equation}\label{eq:graph}
+  \min_{Bj=\eta}\sum_e\ell_e|j_e|
+  =\max_{| (B^Tf)_e|\leq\ell_e}\sum_v\eta_vf_v.
+\end{equation}
+This is linear programming duality. The observable is minimum routing
+cost for random supply and demand. Independent centered Bernoulli,
+Poisson, and Gaussian charges provide distinct microscopic laws to
+compare. The mean charge must be removed, or otherwise balanced,
+before solving the problem.
+
+In a continuum box of side $L$ at unit source intensity, the Gaussian
+critical prediction is total cost of order $L^2\sqrt{\log L}$.
+For the empirical model with $N=L^2$, scaling space by $L$ and mass by
+$N$ gives the exact relation
+\[
+  W_1\!\left(\sum_{i=1}^N\delta_{LX_i},
+                   \mathcal L^2\!\restriction_{[0,L]^2}\right)
+  =L^3W_1(\mu_N,\lambda).
+\]
+Here $W_1$ is extended to equal finite masses. Thus
+\eqref{eq:talagrand} would give coefficient $\sqrt2c_*=\kappa$ in front
+of $L^2\sqrt{\log L}$, provided the boundary identification holds.
+
+A nearest-neighbor square graph uses the path metric and has an
+anisotropic continuum cost. Its limiting coefficient should therefore
+be compared with $\kappa(a,\Phi)$ for the appropriate $\Phi$, not directly
+with the Euclidean $\kappa$. A numerical Euclidean discretization must
+approximate the Euclidean norm and the divergence operator consistently.
+
+For stationary lattice charges of finite dependence range, a natural
+candidate noise strength is
+\[
+  s^2=\sum_{z\in\Z^2}\Cov(\eta_0,\eta_z).
+\]
+With adequate moments, $s^2>0$, and a quantitative transport comparison,
+one may seek coefficient $s\kappa$ for an isotropic continuum cost.
+Finite variance and short-range dependence alone are not asserted here
+to prove this universality. Even finite-range noise can have $s^2=0$:
+for example, $\eta_z=\zeta_z-\zeta_{z-e_1}$ for independent centered
+$\zeta_z$. On a periodic graph this example can be transported by a local edge flux and
+does not have the same positive critical coefficient.
+
+\subsection{Two further tests of the formulation}
+\paragraph{A scalar GFF used as the source.}
+Let $h$ be a mean-zero scalar GFF on $\T^2$. The transport norm of
+$h_\varepsilon$ is a different problem from
+\eqref{eq:vectorgff}. Indeed,
+\[
+  \E\|\nabla(-\Delta)^{-1}h\|_2^2
+  =\sum_{k\ne0}|k|^{-4}<\infty.
+\]
+Hence $\|h_\varepsilon\|_{\KR}$ has bounded expectation, and in fact
+converges in $L^1$ as the cutoff is removed, by the $L^2$ convergence of
+its reference flux and \eqref{eq:stability}. Dividing by
+$\sqrt{\log(1/\varepsilon)}$ gives zero. One must specify whether a
+log-correlated field is the source, the flux, or a potential.
+
+\paragraph{A curl constraint.}
+For a vector field $H$, define
+$\cF_{\curl}(H)=\inf_{\curl K=0}\int|H+K|$ with the same relaxed
+interpretation on the torus. Since $\diver(R^TH)=\curl H$ and rotations
+preserve Euclidean length,
+\[
+  \cF_{\curl}(H)=\cF_{\T^2}(R^TH).
+\]
+Consequently, $RJ_\varepsilon$, which is trivial for the divergence
+observable, gives the original problem for the curl observable. This
+describes minimum integrated velocity magnitude at prescribed vorticity
+when arbitrary curl-free corrections are allowed. Imposing
+incompressibility as an additional constraint would produce a different
+problem. This example suggests studying a field together with its
+differential constraint, rather than assigning a variational theory to
+the covariance alone.
+
+\section{Domains, densities, and extensions of the field class}
+\label{sec:extensions}
+
+For a probability density $\rho$ on a bounded convex planar domain $D$,
+assume initially $\rho$ is smooth and bounded above and below by positive
+constants. The empirical Gaussian source can be realized as
+\begin{equation}\label{eq:densitybridge}
+  \xi_\rho=\sqrt\rho\,W
+       -\rho\int_D\sqrt\rho\,dW,
+\end{equation}
+where $W$ is white noise on $D$. Its covariance is
+$\int_D\rho fg-\int_D\rho f\int_D\rho g$ and its total mass is zero.
+Freezing the density near $x$ gives local noise amplitude
+$\sqrt{\rho(x)}$. The rank-one balancing term is smooth under these
+assumptions and has bounded expected transport cost. The prospective
+locality formula is therefore
+\begin{equation}\label{eq:densityprediction}
+  \sqrt{\frac N{\log N}}\,\E W_1(\mu_N,\rho dx)
+  \longrightarrow c_*\int_D\sqrt{\rho(x)}\dd.
+\end{equation}
+This is a prediction conditional on localization, Gaussian comparison,
+and boundary control. The power $\sqrt\rho$ follows from noise amplitude
+and the one-homogeneity of the cost; it is not imported from the
+quadratic transport formula. Under dilation of $D$ by a factor $r$,
+the right side scales by $r$, as a transport distance should. Densities
+that vanish or are unbounded require separate analysis.
+
+More generally, a slowly varying longitudinal symbol $a_x(\theta)$ and
+cost $\Phi_x$ suggest a Gaussian bulk expression
+\[
+  \int_D\kappa(a_x,\Phi_x)\dd.
+\]
+This is an additional local limit target, beyond the stationary
+problem. Changing the elliptic operator used to generate a field does
+not by itself identify the transport constant: one must calculate its
+resulting longitudinal symbol.
+
+The spectral idea also makes sense in dimension $d$: a vector field with
+covariance $|k|^{-d}A(k/|k|)$ is logarithmically critical, and its
+divergence has source spectrum $|k|^{2-d}a(k/|k|)$. White noise is this
+source precisely when $d=2$. Thus a higher-dimensional log-correlated
+field extension would concern colored sources and should not be
+confused with the ordinary high-dimensional empirical matching problem.
+
+\section{A proof program organized around the missing estimates}
+\label{sec:program}
+
+\subsection{Preserve the coarse flux when combining scales}
+The primary difficulty is that optimizing each annulus separately does
+not optimize the sum. If $J_\varepsilon=\sum_{j\leq m}J^{(j)}$, triangle
+inequalities can charge each of $m\asymp t_\varepsilon$ scales
+separately, giving an order-$m$ bound and losing the order-$\sqrt m$
+behavior. Even when a sharper upper bound is available, scalar costs
+alone do not retain the directional information needed for a limiting
+constant.
+
+A plausible state variable is a convex effective cost depending on the
+imposed mean flux. For the mean-zero reference field on $\T^2$, define
+\begin{equation}\label{eq:profile}
+  F_\varepsilon(q,\omega)
+  =\frac1{\sqrt{t_\varepsilon}}
+      \inf_{\substack{\diver K=0\\\int_{\T^2}dK=0}}
+       \left\|\sqrt{t_\varepsilon}\,q\,dx
+                      +J_\varepsilon dx+K\right\|_\Phi,
+  \qquad q\in\R^2.
+\end{equation}
+The mean-zero condition on $K$ is indispensable here: without it the
+constant vector $q$ could be canceled. The unrestricted observable is
+exactly
+\[
+  \frac{\cF_{\T^2}^\Phi(J_\varepsilon)}{\sqrt{t_\varepsilon}}
+  =\inf_{q\in\R^2}F_\varepsilon(q,\omega).
+\]
+The profiles are convex and satisfy
+$F_\varepsilon(q,\omega)\geq\Phi(q)$ by Jensen's inequality for vector
+measures. Their expectations are even in $q$ by Gaussian symmetry.
+If one proves locally uniform concentration and convergence to a
+deterministic profile $\overline\Phi_a$, together with control of
+minimizing $q$, then symmetry and convexity identify
+$\kappa(a,\Phi)=\overline\Phi_a(0)$. Interchanging expectation and the
+infimum before this control would be an extra, unjustified step.
+
+The intended multiscale operation is to absorb a band of finer scales
+into such a convex cost, conditional on the coarse flux. A successful
+construction must justify spatial localization, boundary matching, and
+the sum of the errors over all bands. Any limiting flow equation for
+the profiles should be derived from that operation. Logarithmic
+variance or an informal renormalization analogy does not determine its
+generator.
+
+\subsection{Boundary screening and a lower-bound mechanism}
+An upper construction can join local transports by correcting their
+boundary imbalance. A matching lower bound must show that a global
+optimizer cannot exploit the artificial interfaces to gain an amount
+of order $\sqrt{t_\varepsilon}$. In dual language, local potentials
+must be joined while preserving $\Phi^\circ(\nabla f)\leq1$ and losing
+only $o(\sqrt{t_\varepsilon})$ in source pairing. In primal language,
+one needs control of boundary traces and the cost of their correction.
+The same estimates are the likely route from a torus to the square
+and to \eqref{eq:densityprediction}.
+
+This is the concrete sense in which the project may develop a critical
+stochastic homogenization theory: it seeks a deterministic constitutive
+cost after optimizing over logarithmically many active scales. It is
+not an immediate application of a conventional fixed-scale cell
+problem or a subadditive theorem. In particular, stabilization of
+increments would have to be formulated for a suitable profile or
+renormalized quantity; the raw $L^1$ costs are not additive in scales.
+
+\subsection{The endpoint of power-cost PDEs}
+For a fixed smooth source $\sigma$, consider the static flux problem
+\[
+  B_p(\sigma)=\inf_{-\diver J=\sigma}\frac1p\int|J|^p\dd,
+  \qquad p>1.
+\]
+Its convex dual is
+\[
+  \sup_f\left\{\langle\sigma,f\rangle
+                   -\frac1q\int|\nabla f|^q\dd\right\},
+  \qquad q=\frac p{p-1},
+\]
+and formally the maximizer solves
+$-\diver(|\nabla f|^{q-2}\nabla f)=\sigma$. As $p\downarrow1$,
+$q\uparrow\infty$ and the dual penalty approaches the hard constraint
+$|\nabla f|\leq1$. This supplies a useful interpretation of the
+degeneracy at $p=1$. The static problem $B_p$ is not an exact formula
+for $W_p^p$ when $p>1$; its link to matching requires a PDE
+approximation such as the one developed in \cite{AVT}.
+
+An endpoint route must control $p\downarrow1$ uniformly as the cutoff
+vanishes. Convergence of the deterministic problem at each fixed
+cutoff would not justify interchanging these two limits. Possible
+concentration of the primal flux is another reason to keep the
+measure-valued formulation.
+
+\subsection{Priority order and concrete deliverables}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item \textbf{Gaussian base case.} Establish sharp two-sided order
+  for the relaxed white-noise problem, then construct a mechanism
+  proving convergence of its normalized expectation. Track the gain
+  over the reference-flux benchmark \eqref{eq:linearbenchmark}.
+  \item \textbf{Effective profile and boundary comparison.} Prove
+  compactness, concentration, and identification for
+  \eqref{eq:profile}, or replace it by another explicitly defined
+  state variable that closes under scale elimination. Prove the
+  torus--square comparison with a quantitative error budget.
+  \item \textbf{Empirical transfer.} Establish
+  \eqref{eq:couplingtarget} at a scale such as \eqref{eq:mesoscale}.
+  Proposition~\ref{prop:transfer} then records exactly how the
+  Gaussian result yields Talagrand's constant.
+  \item \textbf{Universality and locality.} Extend first to independent
+  non-Gaussian cell charges with specified moment assumptions, then
+  to finite-range dependence with positive integrated covariance.
+  Treat smooth densities and anisotropic symbols using the same
+  localization estimates.
+  \item \textbf{Field-specific consequences.} Translate the Gaussian
+  theorem to \eqref{eq:vectorgff} and \eqref{eq:membrane}; these require
+  no empirical approximation. Study hyperuniform sources and altered
+  differential constraints as separate extensions, allowing their
+  normalization to change.
+\end{enumerate}
+
+Numerical work can test the first and second deliverables before a full
+proof is available. A consistent convex flux discretization should
+record the optimized cost, the reference-flux cost, their difference,
+and the primal--dual gap across several cutoffs. Vector GFFs and their
+longitudinal projections provide an exact-law check; a purely
+solenoidal input provides a zero-cost check. Comparisons across noise
+laws should match integrated covariance and transport norm. Apparent
+convergence over a short range of logarithmic scales is evidence for
+a conjecture, not a substitute for an error estimate.
+
+\section{What a successful result would explain}
+\label{sec:meaning}
+
+For random optimal transport, the immediate output is a first-order
+constant and an account of whether solenoidal rerouting changes it.
+For log-correlated fields, the Gaussian theorem would provide a
+nonlinear observable with a deterministic bulk asymptotic, and would
+show precisely which part of the covariance survives the optimization.
+The vector-GFF and membrane identities make this consequence concrete.
+For random charge and network models, it would describe minimum
+neutralization or routing cost and test its dependence on microscopic
+noise. The boundary estimates and effective profiles could then become
+tools for other critical stochastic variational problems.
+
+There is also an empirical-process direction. In the dual description,
+one is seeking exact asymptotics for a Gaussian or empirical supremum
+over a critical Lipschitz class. Extensions to H\"older, Sobolev, or
+Besov test classes would require their own dual constraints and
+normalizations. A matching entropy exponent alone cannot give the
+constant, or even guarantee the same logarithmic correction: a direct
+entropy integral can lose a logarithmic factor.
+
+Finally, a theorem about this spatially integrated convex observable
+would not by itself identify a maximum, an extremal process, a
+derivative martingale, or a Gaussian multiplicative chaos measure.
+Connections to those observables require an additional argument
+involving high points or multiplicative structure. The attainable
+central objective is more specific:
+\[
+  \boxed{\begin{gathered}
+    \text{A variational limit for the longitudinal part of a}\\
+    \text{log-correlated field, with quantitative transport universality.}
+  \end{gathered}}
+\]
+Within that program, Talagrand's empirical problem is the application
+that additionally requires a Gaussian approximation and a boundary
+comparison at the scale of the leading constant.
+
+\begin{thebibliography}{99}
+
+\bibitem{Talagrand}
+M.~Talagrand,
+\emph{Upper and Lower Bounds for Stochastic Processes: Decomposition
+Theorems}, second edition, Springer, 2021.
+Section~4.5, especially Research Problem~4.5.4.
+\href{https://michel.talagrand.net/ULBSPRINGER.pdf}{Author's PDF};
+\href{https://doi.org/10.1007/978-3-030-82595-9}{published edition}.
+
+\bibitem{Santambrogio}
+F.~Santambrogio,
+\emph{Optimal Transport for Applied Mathematicians: Calculus of
+Variations, PDEs, and Modeling}, Birkh\"auser, 2015.
+Sections~3.1 and 4.2.
+\href{https://doi.org/10.1007/978-3-319-20828-2}{DOI: 10.1007/978-3-319-20828-2}.
+
+\bibitem{AST}
+L.~Ambrosio, F.~Stra, and D.~Trevisan,
+\emph{A PDE approach to a 2-dimensional matching problem},
+Probability Theory and Related Fields \textbf{173} (2019), 433--477.
+\href{https://arxiv.org/abs/1611.04960}{arXiv:1611.04960};
+\href{https://doi.org/10.1007/s00440-018-0837-x}{published article}.
+
+\bibitem{GT}
+M.~Goldman and D.~Trevisan,
+\emph{Convergence of asymptotic costs for random Euclidean matching
+problems}, 2020 preprint.
+\href{https://arxiv.org/abs/2009.04128}{arXiv:2009.04128}.
+
+\bibitem{AVT}
+L.~Ambrosio, F.~Vitillaro, and D.~Trevisan,
+\emph{Sharp PDE estimates for random two-dimensional bipartite matching
+with power cost function}, Rendiconti Lincei--Matematica e Applicazioni
+\textbf{35} (2024), 323--342.
+\href{https://arxiv.org/abs/2405.09397}{arXiv:2405.09397};
+\href{https://doi.org/10.4171/RLM/1042}{published article}.
+
+\bibitem{DRSV}
+B.~Duplantier, R.~Rhodes, S.~Sheffield, and V.~Vargas,
+\emph{Log-correlated Gaussian fields: an overview}, 2014 preprint.
+\href{https://arxiv.org/abs/1407.5605}{arXiv:1407.5605}.
+
+\bibitem{LSSW}
+A.~Lodhia, S.~Sheffield, X.~Sun, and S.~S.~Watson,
+\emph{Fractional Gaussian fields: a survey}, 2014 preprint.
+\href{https://arxiv.org/abs/1407.5598}{arXiv:1407.5598}.
+
+\bibitem{TS}
+S.~Torquato and F.~H.~Stillinger,
+\emph{Local density fluctuations, hyperuniformity, and order metrics},
+Physical Review E \textbf{68} (2003), 041113.
+\href{https://doi.org/10.1103/PhysRevE.68.041113}{DOI: 10.1103/PhysRevE.68.041113}.
+
+\end{thebibliography}
+\end{document}

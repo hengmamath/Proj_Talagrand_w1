@@ -1,0 +1,388 @@
+% Referee report
+% Compile: latexmk -pdf -interaction=nonstopmode referee_report_TalagrandW1.tex
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1.1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage[colorlinks=true,linkcolor=BrickRed,citecolor=OliveGreen,urlcolor=NavyBlue]{hyperref}
+
+% ---------- severity tags ----------
+\newcommand{\sevVS}{\textcolor{BrickRed}{\textbf{Very serious}}}
+\newcommand{\sevMaj}{\textcolor{RedOrange}{\textbf{Major}}}
+\newcommand{\sevMin}{\textcolor{Goldenrod!60!black}{\textbf{Minor}}}
+\newcommand{\sevTypo}{\textcolor{Gray}{\textbf{Typo}}}
+
+\newenvironment{finding}[4]{%
+  \par\medskip\noindent
+  \textbf{#1.}~[#2]~\textbf{#4}\\
+  \noindent\textit{Location:}~#3\par\nopagebreak\begin{list}{}{\leftmargin=1.2em\itemsep=2pt\parsep=0pt}}%
+  {\end{list}\medskip}
+\newcommand{\field}[1]{\item[]\textit{#1:}~}
+
+\newenvironment{mquote}{\begin{quote}\itshape}{\end{quote}}
+
+\newcommand{\KR}{\mathrm{KR}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Sp}{\mathbb{S}^2_+}
+
+\emergencystretch=2.5em
+
+\title{Report on ``\textit{Existence of the Critical Two-Dimensional Empirical $W_1$ Constant}''}
+\date{19 August 2026 \\[2pt] \normalsize Manuscript: \texttt{talagrand\_w1\_limit.tex} (3891 lines) / \texttt{talagrand\_w1\_limit.pdf}}
+\author{}
+
+\begin{document}
+\maketitle
+\vspace{-2.5em}
+
+\section*{Summary of the paper}
+
+Let $X_1,X_2,\dots$ be i.i.d.\ uniform on $[0,1]^2$ and let
+\[
+  A_N=\E\sup_{\mathrm{Lip}(f)\le 1}
+  \Bigl|\sum_{i\le N}\Bigl(f(X_i)-\int_{[0,1]^2} f\,d\lambda\Bigr)\Bigr|.
+\]
+It is classical that $A_N\asymp\sqrt{N\log N}$ (Ajtai--Koml\'os--Tusn\'ady, and Talagrand
+in the general-measure form cited in the paper); the existence of the limit of
+$A_N/\sqrt{N\log N}$ is a long-standing open problem (the $p=2$ analogue was settled by
+Ambrosio--Stra--Trevisan). The manuscript claims to prove that the limit exists and to
+characterize it as $c_\star=\kappa/\sqrt2$, where $\kappa=U(1,0)$ and $U$ is the unique
+solution, in an explicitly specified convex cone-growth viscosity class, of the degenerate
+parabolic equation of Monge--Amp\`ere type
+\[
+  \partial_sU=\tfrac1{4\pi}\sqrt{\det D_q^2U},\qquad U(0,q)=|q|.
+\]
+
+The proof is organized as four reductions. (i) A quantitative Poissonization/snapping plus a
+$W_2$ CLT coupling, whose balanced error is transported through the discrete Neumann inverse,
+replaces the empirical problem by a balanced cellwise Gaussian grid field on $Q_{2^J}$
+(Lemma~2.4, Lemma~2.5). (ii) The Gaussian field is split into independent dyadic Haar bands
+carrying an explicit linear zero-normal right inverse (Lemma~3.1); groups of $h$ consecutive
+bands, separated by gaps of $b$ omitted levels, are then integrated out one at a time and
+replaced by a deterministic update $\Psi\mapsto\mathcal H_{h,L}\Psi$ of a convex linear-growth
+``profile'' (Definition~4.1, Lemma~4.2, Lemma~5.1). This scalarization is the technical heart:
+it is a fully quantitative finite-volume periodization of the Beckmann cell problem, with a
+finite trace net, Gaussian concentration over that net, covariant reflection/mollification of
+divergence-free measure corrections, and complete measurable-selection bookkeeping. (iii) The
+second-order response of one band is computed exactly: for $L_H=-\operatorname{div}(H^{-1}\nabla)$
+one has $\tfrac12\operatorname{Tr}(\Pi_hL_H^{-1})=\frac{h\log2}{4\pi}\sqrt{\det H}+o_H(h)$
+(Lemma~6.2), which upgrades, via a Lipschitz truncation and a Dirichlet--Neumann squeeze
+(Lemmas~6.1, 6.3, 6.4) and a global conjugate barrier construction (Lemma~6.5), to one-sided
+consistency of the rescaled iteration with the generator $\mathcal G(H)=\frac1{4\pi}\sqrt{\det H}$.
+(iv) A comparison principle in the strong convex viscosity class identifies the limit of the
+monotone scheme (Lemma~7.1), and a joint scale schedule $h=\lfloor J^{3/4}\rfloor$,
+$b=\lceil(\log J)^2\rceil$, $L=S^{1/8}$, $B=S^{3/8}$, $A=S^{5/8}$, $\varepsilon=S^{-1/32}$ with
+$S=2^{b+1}$ closes the error budget (Lemma~8.1).
+
+\section*{General assessment}
+
+This is a serious, unusually carefully written manuscript. The architecture is coherent, the
+normalizations are internally consistent, and the two places where a paper of this kind
+typically fails --- identification of the exact logarithmic coefficient, and control of the
+accumulated one-step error over $\asymp J/h$ operator applications --- are both handled with
+quantitative estimates rather than with qualitative homogenization. I re-derived independently
+essentially every displayed estimate of Sections~2--8; the constants, the exponent bookkeeping
+in the scale schedule (51), and the generator constant $1/(4\pi)$ all come out as
+printed. Two independent external consistency checks corroborate the analytic normalization
+(see Q1 below): the pointwise bound $\mathcal G(H)\le\frac1{8\pi}\operatorname{tr}H$ makes the
+displayed flow dominated by the linear heat flow whose value at the origin is exactly the
+Helmholtz-flux upper bound $1/(2\sqrt2)$, and the resulting numerical value
+$c_\star\approx0.24045$ sits below the bound $c_\star\le 1/(2\sqrt\pi)\approx0.28209$ implied by
+Ambrosio--Stra--Trevisan and Cauchy--Schwarz.
+
+\textbf{The review found 0 very serious issues, 0 major issues, 2 minor issues, and 5
+typographical errors; 6 concerns remain unresolved.} Both minor issues are localized in the
+proof of Lemma~7.1 and I can write down the repair for each; neither threatens the main theorem.
+The verification depth was a full pass over the whole manuscript with independent re-derivation
+of all displayed estimates, with second passes on Lemma~2.4, Lemma~5.1(26), Lemma~6.2, and
+Lemma~7.1 Steps~3--7; a small number of compressed auxiliary arguments (the relaxed duality of
+Definition~2.1, the measurable-selection principle of Lemma~5.1 Step~8, the Weyl-law bracketing
+of Lemma~6.2 Step~2) were checked for correctness of the statement and of the constants rather
+than reconstructed in full, and are recorded as such in Appendix~A.
+
+Subject to the two minor repairs and to satisfactory answers to Q2--Q4, I see no obstruction to
+publication; given the strength of the claim, I would recommend that the authors also expand
+the three items listed in Appendix~A as ``sampled'' into self-contained arguments, since a
+reader will reasonably want every load-bearing step of a proof of this statement in full.
+
+\section*{Minor issues}
+
+\begin{finding}{m1}{\sevMin}{\texttt{talagrand\_w1\_limit.tex:3323--3335} and \texttt{:3490}; Lemma~7.1, Steps~3, 5 and 6}{Convexity of the lower half-relaxed limit is used but not established}
+  \field{Quote}
+  \begin{mquote}
+    ``Let a smooth convex $\phi$ touch $\underline U$ strictly from below at $(s_0,q_0)$, with
+    $s_0>0$ \dots\ Fix $0<\delta<\lambda_{\min}(H)$ and apply Lemma~6.5 to the spatial slice
+    $q\mapsto\underline U(s_0,q)$, using $q\mapsto\phi(s_0,q)$ as its lower test.''
+  \end{mquote}
+  and, in Step~6,
+  \begin{mquote}
+    ``we prove comparison in the precise class produced by (46)--(46a): the functions are
+    continuous, convex and $1$-Lipschitz in space, nondecreasing in time \dots''
+  \end{mquote}
+  \field{Issue} Available (P): each $U_m(s,\cdot)$ is convex, $1$-Lipschitz, and satisfies
+  $|q|\le U_m\le|q|+C\sqrt s+o(1)$ by (46)--(46a). Claimed (Q): the lower half-relaxed limit
+  $\underline U(s,\cdot)$ belongs to the convex class, so that Lemma~6.5 (whose hypothesis is
+  ``$U$ convex and $1$-Lipschitz with $|p|-C\le U(p)\le|p|+C$'') applies to its spatial slice,
+  and so that Step~6's comparison class contains it. What in fact follows (R): only that
+  $\underline U$ is $1$-Lipschitz, cone-bounded and nondecreasing in time. A pointwise
+  \emph{liminf} of convex functions need not be convex, and this is not repaired by the cone
+  bounds. Certificate (all hypotheses of the stated class are met): in one spatial dimension put
+  $f_1(q)=|q|+1$ and $f_2(q)=\sqrt{q^2+4}$. Both are convex, $1$-Lipschitz, and satisfy
+  $|q|\le f_i(q)\le|q|+2$. Their pointwise minimum equals $|q|+1$ for $|q|\le\frac32$ and
+  $\sqrt{q^2+4}$ for $|q|\ge\frac32$; the one-sided slopes at $q=\frac32$ are $1$ and
+  $\frac{1.5}{2.5}=0.6$, so the slope \emph{decreases} and the minimum is not convex. Taking
+  $U_m=f_1$ for odd $m$ and $U_m=f_2$ for even $m$ (constant in $s$, hence in the class up to the
+  time-monotonicity requirement, which can be arranged by adding $\varepsilon s$) gives
+  $\liminf_mU_m=\min(f_1,f_2)$, non-convex. (By contrast $\overline U$ \emph{is} convex, since
+  $\limsup_m=\inf_N\sup_{m\ge N}$ is a pointwise limit of the convex functions
+  $\sup_{m\ge N}U_m$.) Convexity of $\underline U$ is used in three places: the invocation of
+  Lemma~6.5 in Step~3; the identity $\underline U(s_0,q_0+ta_0)=\underline U(s_0,q_0)+t$ in the
+  $|a_0|=1$ case of Step~5, which is deduced from $a_0\in\partial\underline U(s_0,\cdot)(q_0)$;
+  and membership of $v=\underline U$ in the comparison class of Step~6.
+  \field{Severity justification} Minor, not a typo: the step is invalid as written under any
+  reading, since the asserted membership in the convex class does not follow from
+  (46)--(46a). Minor, not major: the repair is routine and uses only estimates already proved.
+  By (46a) together with the spatial Lipschitz bound and $0\le U_m(s,q)-|q|\le C\sqrt s+o(1)$,
+  the family $\{U_m\}$ is locally uniformly bounded and locally equicontinuous on
+  $[0,\infty)\times\R^2$, so Arzel\`a--Ascoli applies. One may therefore replace the
+  half-relaxed limits throughout Steps~2--7 by locally uniform subsequential limits: any such
+  limit $U^{(\infty)}$ is convex and $1$-Lipschitz in space (a locally uniform limit of convex
+  functions is convex), nondecreasing in time, cone-bounded, and carries the same time modulus,
+  so it lies in the Step~6 class; Steps~2--5 applied along that subsequence show it is both a
+  subsolution and a strong convex supersolution; Step~6--7 comparison then forces all
+  subsequential limits to coincide, and equicontinuity upgrades this to convergence of the whole
+  sequence. No estimate needs to be strengthened.
+  \field{Suggested fix} Insert, after (46a), one paragraph replacing the half-relaxed limits by
+  Arzel\`a--Ascoli subsequential limits as above, and note explicitly that convexity and the
+  $1$-Lipschitz bound pass to locally uniform limits. (Alternatively, keep half-relaxed limits
+  but prove convexity of $\underline U$ directly; I do not see how to do this without
+  equicontinuity, i.e.\ without the argument just described.)
+  \field{Affects} Lemma~7.1 Steps~3--7 $\to$ (45) $\to$ Lemma~8.1 (54)--(56) $\to$
+  Theorem~1.1. Confidence: high.
+\end{finding}
+
+\begin{finding}{m2}{\sevMin}{\texttt{talagrand\_w1\_limit.tex:3606--3645}; Lemma~7.1, Step~7, (48f)--(48h)}{The supersolution inequality is applied at a closed lower semijet without checking that it is inherited}
+  \field{Quote}
+  \begin{mquote}
+    ``Quadratic sup-convolution of $\widehat u$, quadratic inf-convolution of $\widehat v$, and
+    the ordinary second-derivative test at the regularized maximum, followed by passage to closed
+    semijets, give $(a,p,X)\in\overline{\mathcal P}^{2,+}\widehat u$,
+    $(b,p,Y)\in\overline{\mathcal P}^{2,-}\widehat v$ \dots\ Hence $Y\ge0$, including the possibly
+    singular case covered by the strong supersolution definition. Since determinant is
+    nondecreasing in the Loewner order on $\Sp$, $a\le\mathcal G(X)\le\mathcal G(Y)\le b$.''
+  \end{mquote}
+  \field{Issue} Available (P): $\widehat v$ is a strong convex supersolution, i.e.\ (by the
+  definition stated in Lemma~7.1 and in the introduction) $\varphi_s\ge\mathcal G(D_q^2\varphi)$
+  holds for every smooth lower test $\varphi$ \emph{whose spatial Hessian is positive
+  semidefinite}; and $(b,p,Y)\in\overline{\mathcal P}^{2,-}\widehat v$ with $Y\ge0$ by (48h) and
+  $X\ge0$. Claimed (Q): $\mathcal G(Y)\le b$. What actually follows (R): nothing yet, because
+  membership in the \emph{closed} semijet only supplies genuine lower jets
+  $(b_n,p_n,Y_n)\in\mathcal P^{2,-}\widehat v(t_n,z_n)$ with $Y_n\to Y$, and these $Y_n$ need not
+  be positive semidefinite --- convexity of $\widehat v$ bounds second differences from below,
+  not from above, so a lower jet at a point of non-differentiability can have an arbitrarily
+  negative Hessian. Since $\mathcal G$ is not merely discontinuous but \emph{undefined} off
+  $\Sp$, and the supersolution property is postulated only on $\Sp$, no inequality is available
+  along the approximating sequence and the standard ``$F$ continuous, so the equation passes to
+  closed semijets'' argument does not apply. The sentence ``the lower block bound \dots\ keeps
+  the approximate Hessians bounded'' addresses boundedness, not semidefiniteness. Note that the
+  manuscript itself uses the corresponding regularization on the subsolution side in Step~6
+  (``at a singular upper test of $\widehat u$, add $\sigma|z-z_0|^2$ \dots\ then let
+  $\sigma\downarrow0$''), which is exactly the device missing here.
+  \field{Severity justification} Minor, not a typo: an inequality is asserted whose hypothesis is
+  not available at the point where it is used, and the gap is not a matter of notation. Minor,
+  not major: the repair is two lines and uses only the paper's own definitions. Lower semijets
+  are downward closed in the Hessian variable, i.e.\ $(b,p,Y')\in\mathcal P^{2,-}$ whenever
+  $Y'\le Y$ and $(b,p,Y)\in\mathcal P^{2,-}$. Hence, with
+  $\mu_n:=\max\{0,-\lambda_{\min}(Y_n)\}$, one has $(b_n,p_n,Y_n-\mu_nI)\in\mathcal P^{2,-}
+  \widehat v(t_n,z_n)$ with $Y_n-\mu_nI\ge0$; a $C^2$ lower test with this $2$-jet and
+  semidefinite spatial Hessian at the contact point exists, so
+  $b_n\ge\mathcal G(Y_n-\mu_nI)$. Since $Y_n\to Y\ge0$ we get $\mu_n\to0$, and continuity of
+  $\mathcal G$ on $\Sp$ gives $b\ge\mathcal G(Y)$.
+  \field{Suggested fix} Add the displayed two-line argument immediately after (48h), and state
+  once (e.g.\ in the paragraph defining the strong formulation) the semijet form of the
+  sub/supersolution properties that is actually used, namely: $a\le\mathcal G(X)$ for every
+  $(a,p,X)\in\overline{\mathcal P}^{2,+}u$ with $X\ge0$, and $b\ge\mathcal G(Y)$ for every
+  $(b,p,Y)\in\overline{\mathcal P}^{2,-}v$ with $Y\ge0$, together with the two-line proofs that
+  these follow from the test-function definitions (on the subsolution side by adding
+  $\epsilon|z-z_0|^2$ and letting $\epsilon\downarrow0$, on the supersolution side as above).
+  \field{Affects} Lemma~7.1 Step~7 (comparison) $\to$ uniqueness of the limit $\to$ (45) $\to$
+  Theorem~1.1. Confidence: high.
+\end{finding}
+
+\section*{Typographical corrections}
+\begin{enumerate}[label=T\arabic*., leftmargin=2.6em, itemsep=2pt]
+  \item \texttt{:2626--2636}, the two H\"older displays quoted after (32fD): the second term of the
+  first display reads $|y-\xi|^{-d+\alpha+1}$ and that of the second reads
+  $|y-\xi|^{-d+\alpha}$. The correct symmetric exponents are
+  $|y-\xi|^{-d-\alpha+1}$ and $|y-\xi|^{-d-\alpha}$: this is what
+  Guzm\'an--Leykekhman--Rossmann--Schatz, \emph{Numer.\ Math.} \textbf{112} (2009), formula
+  (1.4), proves and what Diening--Rolfes--Salgado invoke. (The arXiv version of the cited paper,
+  arXiv:2305.03575v1, prints the asymmetric exponents, so the manuscript is faithfully
+  reproducing a typo in its source; since the text says ``Only (32fD), the first assertion, is
+  used below'', nothing depends on it, but a reader checking the citation will be confused.)
+  \item \texttt{:668--670}: the quoted normal-approximation result is stated ``for every
+  $p>1$''. Fang's lemma (restating Bobkov, \emph{Probab.\ Theory Related Fields} \textbf{170}
+  (2018), Theorem 1.1) holds for every real $p\ge1$. Only $p=2$ is used, so this is harmless;
+  replace $p>1$ by $p\ge1$ for accuracy. In the arXiv version (arXiv:1807.05741v2) the
+  statement is Lemma~3.3, not Lemma~3.4 --- please double-check the published numbering.
+  \item \texttt{:2253}: in ``$K^{\rm raw}(c,\eta)\le\int_{Q_L}(|Q|+M)$'' the symbol $|Q|$ denotes
+  the pointwise norm of the fine flux $Q$ of (16b), whereas everywhere else in the paper (e.g.\
+  in (24), (25), (26i)) $|Q|$ denotes the \emph{area} of the ambient square $Q=Q_R$. Rename one
+  of the two (e.g.\ write the flux as $q_{\mathrm{fine}}$, or the area as $\mathcal L^2(Q)$).
+  \item \texttt{:660--663}, (8): the display mixes indices, $\E|P_q-q-\sqrt q\,G_z|^2\le C$; either
+  drop the subscript $z$ on $G$ or add it to $P$.
+  \item \texttt{:2565} (Lemma~6.2, Step~2): the boundary eigenvalue count is given as
+  $C_H(rR+r^{-1}\sqrt R+r^{-2})$. Dirichlet--Neumann bracketing on $\asymp \mathrm{per}/r$
+  boundary squares of side $r$ gives $C_H(rR+\sqrt R+r^{-1})$. The printed bound is weaker,
+  hence still valid for the conclusion (32e), but the two extra powers of $r^{-1}$ look
+  unintended.
+\end{enumerate}
+
+\section*{Unresolved concerns and questions for the authors}
+\begin{enumerate}[label=Q\arabic*., leftmargin=2.6em, itemsep=3pt]
+  \item \emph{(Corroboration the authors may wish to record.)} The paper characterizes but does
+  not evaluate $c_\star$. Two checks strongly support the normalization and would be worth a
+  remark. (i) Since $\mathcal G(H)=\frac1{4\pi}\sqrt{\lambda_1\lambda_2}\le\frac1{8\pi}
+  \operatorname{tr}H$, the linear flow $\partial_sU=\frac1{8\pi}\Delta U$ with $U(0,q)=|q|$,
+  i.e.\ $U_{\mathrm{lin}}(s,q)=\E|q+\sqrt{s/(4\pi)}\,G|$, is a supersolution, whence
+  $\kappa\le U_{\mathrm{lin}}(1,0)=\frac1{2\sqrt2}$ --- which is exactly the bound obtained
+  directly from the Helmholtz competitor $v=\nabla\Delta^{-1}\rho$ in the dyadic Gaussian
+  problem. This is a nontrivial confirmation of the coefficient $1/(4\pi)$ in (R7)/(32).
+  (ii) By rotational symmetry the self-similar profile $V(y)=U(1,y)=v(|y|)$ satisfies
+  $v-rv'=\frac1{2\pi}\sqrt{v''v'/r}$; shooting from $v(0)=\kappa$, $v'(0)=0$, $v''(0)=2\pi\kappa$
+  and selecting the unique $\kappa$ for which $v'\uparrow1$ (equivalently $v(r)-r\to0$) gives
+  $\kappa=0.3400457\ldots$ and $c_\star=\kappa/\sqrt2=0.2404487\ldots$, comfortably below both
+  $\frac1{2\sqrt2}/\sqrt2=0.25$ and the bound $c_\star\le\frac1{2\sqrt\pi}=0.28209\ldots$ that
+  follows from $W_1\le W_2$, Cauchy--Schwarz and the Ambrosio--Stra--Trevisan value
+  $\lim (n/\log n)\E W_2^2=\frac1{4\pi}$. Could the authors add such a consistency
+  paragraph? It also answers the reader's first question about the theorem.
+  \item \emph{Non-degeneracy of the uniqueness class.} A reader will immediately observe that
+  $U(s,q)\equiv|q|$ satisfies $\partial_sU=\frac1{4\pi}\sqrt{\det D^2U}$ in the ordinary
+  viscosity sense away from $q=0$ (both sides vanish, since $D^2|q|$ is singular), lies in the
+  convex cone-growth class, and would give $\kappa=0$. The entire content of the word
+  ``strong'' is to exclude it: $\varphi(s,q)=\tfrac12|q|^2$ is an admissible lower test at
+  $(s_0,0)$ with $D^2\varphi=I>0$ and $\varphi_s=0<\frac1{4\pi}=\mathcal G(I)$. Please state this
+  one-line remark explicitly where the strong formulation is introduced (page 3 and Lemma~7.1);
+  as written, the reader has no signal that the notion is not vacuous, and it is the single most
+  load-bearing definitional choice in the paper.
+  \item \emph{Definition~2.1, duality (2).} The relaxed duality for linear-growth functionals
+  with the zero-normal-trace convention is proved by a two-paragraph separation argument
+  (``the separating distribution is a smooth test function $f$, and the coefficient of the
+  epigraph coordinate is positive''). I could verify the statement (it specializes correctly to
+  the Kantorovich--Rubinstein/Beckmann identity (1)) and the coercivity and lower
+  semicontinuity that closedness of $\mathcal E$ requires, but not the choice of locally convex
+  topology in which $\mathcal E$ is closed and the separating functional is realized by a
+  $C^1(\overline Q)$ function. Could the authors either specify the pairing explicitly or cite a
+  reference (e.g.\ Bouchitt\'e--Buttazzo for relaxation of linear-growth integrands, or
+  Santambrogio's book for the Beckmann problem on a convex domain)?
+  \item \emph{Lemma~5.1, Step~8, selection principle.} The stated principle (``$S$ standard
+  Borel, $X$ a countable union of compact metrizable sets, $\Gamma\subset S\times X$ Borel with
+  nonempty closed sections, $f$ jointly Borel, lower semicontinuous in $x$, with compact
+  parameterwise sublevels $\Rightarrow$ the infimum is universally measurable and there is a
+  universally measurable $\tau_{\rm sel}$-minimizer'') is plausible and its sketched proof is the
+  standard nested-ball selection, but I did not verify it in this exact form. A citation
+  (Bertsekas--Shreve, Prop.\ 7.50, or Himmelberg--Parthasarathy--Van Vleck) would let a reader
+  discharge Step~8 quickly.
+  \item \emph{Lemma~6.3 as invoked in Lemma~7.1 Step~2.} Lemma~6.3 is stated for a profile $F_T$
+  satisfying (33a) on $|z|\le r_0\sqrt T$, whereas in Step~2 the function satisfying (33a) is the
+  test function $\phi$ (only inside the parabolic cylinder) while the $1$-Lipschitz bound on the
+  bad event is used for $U_m$. The manuscript does spell out the two ingredients, so I believe
+  the argument, but as written Lemma~6.3 is not literally applicable. Could the authors either
+  restate Lemma~6.3 with the two functions separated (a local upper Taylor comparison plus a
+  global Lipschitz bound), or inline the three-line computation in Step~2?
+  \item \emph{Uniformity of $o_H(h)$ in (30) across the iteration.} The error in (30)/(32) is
+  uniform only on compact subsets of the positive-definite cone. This is harmless in Lemma~7.1,
+  where $H$ is fixed by the test function, and in Lemma~6.5, where $D^2B_\delta^*$ is
+  \emph{exactly} the constant matrix $(H-\delta I)^{-1}$ on a ball of slopes (so (38c) is
+  uniform for free). It would help the reader if this observation --- that the $H$ appearing in
+  (38c) does not vary with $q\in V$ --- were stated explicitly at the end of Lemma~6.5 Step~4,
+  since otherwise (38c) looks like it needs a uniformity that (30) does not provide.
+\end{enumerate}
+
+\appendix
+\section{Verification coverage}
+\medskip\noindent\begin{minipage}{\linewidth}\textbf{Part 1: Sections 1--4.}\par\nobreak\smallskip\nobreak
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.235\linewidth}>{\raggedright\arraybackslash}p{0.135\linewidth}X@{}}
+\toprule
+Part & Status & Method / limitation \\
+\midrule
+\S1 roadmap (R1)--(R12) & verified & every exponent and error budget recomputed; (R3), (R7), (R9)--(R12) checked against the schedule of \S8 \\
+Def.\ 2.1, duality (1)--(2) & sampled & statement verified (specializes correctly to KR/Beckmann); the separation argument's functional-analytic setting not reconstructed --- see Q3 \\
+Lemma 2.2, Def.\ 2.3 & verified & line-by-line \\
+Lemma 2.4 (5), (5a)--(5d) & verified & line-by-line, second pass; Poisson 4th central moment $\theta+3\theta^2$, sum $(1+3\theta)/q$, path-grid Neumann spectrum, $\operatorname{Tr}L^+\le CK^2\log(2K)$, and the $\ell^1$/$\ell^2$ edge bound all re-derived \\
+Lemma 2.5 (9) & verified & line-by-line \\
+Lemma 3.1 (10)--(12c) & verified & line-by-line; the right inverse (12a) re-derived from (22a0), divergence identity, all four outer normal traces and both internal interfaces checked, $\E|R_j\xi_j|^2\le\frac34$ recomputed \\
+Def.\ 4.1 (13)--(16d) & verified & line-by-line, including the strict-slope extension and (16b)--(16c) \\
+Lemma 4.2 (17)--(21e) & verified & line-by-line; net entropy (21), core--corridor Lipschitz arithmetic, Poincar\'e bound (21b), subgaussian radius $C\sqrt{|\Omega|}$ and the resulting $C|\Omega|\sqrt{\log(C/\varepsilon)/L}$ all re-derived. Step~5 (torus periodization) is not used in the main line \\
+\bottomrule
+\end{tabularx}
+\end{minipage}
+\medskip\noindent\begin{minipage}{\linewidth}\textbf{Part 2: Sections 5--6.}\par\nobreak\smallskip\nobreak
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.235\linewidth}>{\raggedright\arraybackslash}p{0.135\linewidth}X@{}}
+\toprule
+Part & Status & Method / limitation \\
+\midrule
+Lemma 5.1 (22)--(26s) & verified & line-by-line, second pass on (25a5)--(26); telescoping bound (25a7), seam-jump/cocycle construction (25a8), the boxed comparison (26), and the primal/dual pasting in Steps~5 and 7 re-derived. Step~8 selections: see Q4 \\
+Lemma 6.1 (27)--(28c) & verified & line-by-line \\
+Lemma 6.2 (29)--(32h) & verified & line-by-line, second pass; $\operatorname{Cov}(\eta_h)=\Pi_h$ recomputed from scratch, Weyl constant $\sqrt{\det H}/(4\pi)$ and heat-trace/log-Ces\`aro bookkeeping re-derived, (30b) squeeze and (32g)--(32h) annulus sum re-derived. Boundary eigenvalue count: see T5 \\
+Lemma 6.3 (33)--(33c) & verified & line-by-line; good/bad split, linear-term transfer and the three error terms re-derived \\
+Lemma 6.4 (34)--(37a) & verified & line-by-line; the exact dual reduction (36) and the truncation loss $O_H(h^2/T^{3/2})$ re-derived \\
+Lemma 6.5 (38)--(41e) & verified & line-by-line; uniqueness of the dual maximizer, the wall constant (41b), (41c), strictness of the barrier and the Bregman gap (41e) re-derived \\
+\bottomrule
+\end{tabularx}
+\end{minipage}
+\medskip\noindent\begin{minipage}{\linewidth}\textbf{Part 3: Sections 7--8 and the numerical check.}\par\nobreak\smallskip\nobreak
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.235\linewidth}>{\raggedright\arraybackslash}p{0.135\linewidth}X@{}}
+\toprule
+Part & Status & Method / limitation \\
+\midrule
+Lemma 7.1 Steps 1--2 & verified & line-by-line; (45a), (46), (46a) re-derived \\
+Lemma 7.1 Steps 3--5 & verified & line-by-line; (47e)--(47j) re-derived. Findings m1 (Steps 3, 5) \\
+Lemma 7.1 Steps 6--8 & verified & line-by-line; (48a), (48c)--(48h) re-derived, including $X\ge0$ from convexity and $X\le Y$ by testing on common directions. Findings m1, m2 \\
+Lemma 8.1 (49)--(56) & verified & line-by-line; the schedule (51), $\delta=O(S^{-1/32})$, (23a), $\varepsilon L\to\infty$, $D=o(J)$, $me_J=o(\sqrt J)$, and the terminal Jensen identity re-derived \\
+Numerical value of $\kappa$ & verified & independent shooting solution of the radial self-similar ODE; PDE residual $<10^{-15}$ relative; see Q1 \\
+\bottomrule
+\end{tabularx}
+\end{minipage}
+\medskip\noindent\begin{minipage}{\linewidth}\textbf{Part 4: External inputs.}\par\nobreak\smallskip\nobreak
+\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.235\linewidth}>{\raggedright\arraybackslash}p{0.135\linewidth}X@{}}
+\toprule
+Part & Status & Method / limitation \\
+\midrule
+Talagrand [T] & external not verified & the two-sided AKT bound is used only for finiteness/positivity of $c_\star$; taken as quoted \\
+Fang [F] / Bobkov & verified & statement obtained from arXiv:1807.05741v2 and Bobkov's own PDF; hypotheses match up to T2 \\
+Diening--Rolfes--Salgado [D] & verified & Proposition 4.1 obtained from arXiv:2305.03575v1; the bound (32fD) actually used matches; see T1 \\
+Wang--Yan [W] & external not verified & abstract confirms $\|\nabla P_t\|_{1\to\infty}\le ct^{-(d+1)/2}$ for compact domains with $C^2$-smooth \emph{or convex} boundary and states that it implies a Gaussian pointwise gradient bound; the exact form of Theorem 1.2 and of \S4.3 was not obtained \\
+Crandall--Ishii--Lions [C] & external not verified & the parabolic doubled-variable lemma is used in its standard form; taken as quoted \\
+\bottomrule
+\end{tabularx}
+\end{minipage}
+
+
+\smallskip
+\noindent\textbf{References cited in this report.}
+{\small
+\begin{description}[leftmargin=2.4em,itemsep=0pt,topsep=2pt,parsep=0pt]
+  \item[{[T]}] M.\ Talagrand, \emph{The Ajtai--Koml\'os--Tusn\'ady matching theorem for general measures}, Progr.\ Probab.\ 30 (1992), 39--54.
+  \item[{[F]}] X.\ Fang, \emph{Wasserstein-2 bounds in normal approximation under local dependence}, Electron.\ J.\ Probab.\ 24 (2019), no.\ 35 (arXiv:1807.05741).
+  \item[{[D]}] L.\ Diening, J.\ Rolfes, A.\ J.\ Salgado, \emph{Pointwise gradient estimate of the Ritz projection}, SIAM J.\ Numer.\ Anal.\ 62 (2024), 1212--1225 (arXiv:2305.03575).
+  \item[{[W]}] F.-Y.\ Wang, L.\ Yan, \emph{Gradient estimate on the Neumann semigroup and applications}, arXiv:1009.1965.
+  \item[{[C]}] M.\ G.\ Crandall, H.\ Ishii, P.-L.\ Lions, \emph{User's guide to viscosity solutions}, Bull.\ Amer.\ Math.\ Soc.\ 27 (1992), 1--67.
+  \item[{[GLRS]}] J.\ Guzm\'an, D.\ Leykekhman, J.\ Rossmann, A.\ H.\ Schatz, \emph{Optimal max-norm error estimates \dots\ and H\"older estimates for the Green's function on convex polyhedral domains}, Numer.\ Math.\ 112 (2009), 221--243.
+  \item[{[AST]}] L.\ Ambrosio, F.\ Stra, D.\ Trevisan, \emph{A PDE approach to a 2-dimensional matching problem}, Probab.\ Theory Related Fields 173 (2019), 433--477.
+\end{description}
+}
+
+\medskip
+\noindent The findings and the assessment above apply to the material marked \emph{verified};
+parts marked \emph{sampled} or \emph{external not verified} could change the picture. In
+particular, no claim is made here that the items flagged in Q3--Q4 and T5, and the two
+externally quoted analytic inputs [W], [C] are correct as used; they were accepted as
+stated.
+
+\end{document}

@@ -1,0 +1,3661 @@
+\documentclass[11pt,reqno]{ijmart}
+
+\usepackage[a4paper,margin=3.5cm]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[english]{babel}
+\usepackage[babel]{microtype}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools,mathrsfs,esint}
+\usepackage{mathalpha}
+\usepackage{enumitem}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{stix} 
+
+\usepackage[
+  breaklinks=true,
+  pagebackref=true,
+  hypertexnames=false
+]{hyperref}
+\hypersetup{
+  colorlinks=true,
+  pdfpagemode=UseNone,
+  citecolor=ForestGreen,
+  linkcolor=MidnightBlue,
+  urlcolor=RoyalBlue,
+  pdfstartview=FitH,
+  pdftitle={Existence of the critical two-dimensional empirical W1 constant},
+  pdfauthor={Heng Ma},
+  pdfsubject={Empirical transport, Gaussian fields, renormalization, and convex viscosity flow}
+}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\1}{\mathbf 1}
+\newcommand{\cL}{\mathcal L}
+\newcommand{\KR}{\mathrm{KR}}
+\newcommand{\dist}{\operatorname{dist}}
+\newcommand{\Lip}{\operatorname{Lip}}
+
+
+% Keep short title / authors / page numbers,
+% remove IJM branding only 
+\fancyhead[LO]{}
+\fancyhead[RE]{} 
+% First page: remove journal name and DOI,
+% keep centered page number at bottom
+\fancypagestyle{firstpage}{%
+  \fancyhf{}
+  \cfoot{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+
+\title{Existence of the Critical Two-Dimensional Empirical \(W_1\) Constant}
+\author{Heng Ma}
+\address[Heng Ma]{Faculty of Data and Decision Sciences, Technion---Israel Institute of Technology, Haifa 32000, Israel}
+\email{hengmamath(at)gmail(dot)com}
+\urladdr{\url{https://hengmamath.github.io}}
+\date{\today}
+
+\begin{document}
+\begin{abstract}
+Let \(X_1,X_2,\ldots\) be independent uniform points in the unit square and let
+\(\lambda\) denote Lebesgue probability measure.  We prove that the critical
+two-dimensional empirical \(1\)-Wasserstein expectation has an asymptotic
+constant:
+\[
+  \lim_{N\to\infty}
+  \sqrt{\frac{N}{\log N}}\,
+  \mathbb E W_1\!\left(\frac1N\sum_{i=1}^N\delta_{X_i},\lambda\right)
+  =c_\star.
+\]
+The constant is characterized by a convex viscosity flow.  If \(U\) denotes the
+unique solution in the convex cone-growth class of
+\[
+  \partial_tU=\frac1{4\pi}\sqrt{\det D^2U},
+  \qquad U(0,q)=|q|,
+\]
+then \(c_\star=U(1,0)/\sqrt2\).  The proof replaces the empirical source
+by a Gaussian field and successively absorbs groups of spatial scales
+into a convex transport cost.  The quadratic response of this cost
+determines the limiting flow. \textbf{The initial proof  was found by OpenAI's GPT-5.6 sol.}
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+\newpage 
+
+\section{Introduction}\label{sec:introduction}
+
+Let $X_1,X_2,\ldots$ be independent uniform points in $[0,1]^2$, let
+$\lambda$ be Lebesgue probability measure on this square, and write
+$\mu_N=N^{-1}\sum_{i=1}^N\delta_{X_i}$.  We study the leading constant
+in the expected transport distance from $\mu_N$ to $\lambda$.
+The Ajtai--Koml\'os--Tusn\'ady matching theory and Talagrand's
+general-measure formulation give the critical estimate
+\[
+  \mathbb E W_1\!\left(\sum_{i=1}^N\delta_{X_i},N\lambda\right)
+  \asymp \sqrt{N\log N};
+\]
+see Talagrand~\cite{Talagrand1992}.  This determines the order of the
+expectation but leaves open whether its ratio to $\sqrt{N\log N}$
+converges.  We prove convergence and characterize the limit by a
+deterministic evolution equation.  The theorem is stated in the equivalent
+empirical-process formulation; the equivalence with $N\mathbb E
+W_1(\mu_N,\lambda)$ is recorded in Lemma~\ref{lem:empirical-transport}.
+
+\begin{theorem}[Main result]\label{thm:intro-main}
+Let \(X_1,X_2,\ldots\) be independent random variables uniformly distributed
+on \([0,1]^2\), and let \(\lambda\) be Lebesgue probability measure on this
+square.  There is a finite positive constant \(c_\star\) such that
+\[
+\lim_{N\to\infty}\frac1{\sqrt{N\log N}}
+\mathbb E\sup_{\Lip(f)\leq1}
+\left|\sum_{i=1}^N\left(f(X_i)-\int_{[0,1]^2}f\,d\lambda\right)\right|
+=c_\star.
+\]
+Moreover, \(c_\star=\kappa/\sqrt2\), where \(\kappa=U(1,0)\) and \(U\) is
+the unique convex cone-growth viscosity solution, in the sense specified
+in Subsection~\ref{subsec:solution-class}, of
+\[
+\partial_tU=\frac1{4\pi}\sqrt{\det D_q^2U},
+\qquad U(0,q)=|q|.
+\]
+\end{theorem}
+
+The result concerns uniform sampling on the square with the Euclidean
+transport cost.  It characterizes $c_\star$ without evaluating it
+numerically.  We next explain why the transport problem leads to this
+equation, before specifying its solution class.
+
+\subsection{Proof strategy}\label{subsec:proof-roadmap}
+
+Write $A_N$ for the expectation in Theorem~\ref{thm:intro-main}.
+The proof uses the flux formulation of transport.  For a balanced source
+$\sigma$ on a square $Q$, it reads
+\[
+\|\sigma\|_{\KR}
+=\inf_{-\operatorname{div}v=\sigma,\ v\cdot n=0}|v|(Q).
+\]
+For an ordinary vector field, $|v|(Q)=\int_Q|v(x)|\,dx$.
+The divergence constraint specifies the source transported by $v$, and
+the boundary condition prevents flux from leaving $Q$.
+Proposition~\ref{def:kr-beckmann} gives the precise formulation for vector
+measures and its dual formulation with Lipschitz potentials.
+
+Fluxes can be added when sources are added, but the cost of their sum
+depends on their directions.  Thus separate optimal costs for different
+scales do not determine the optimal cost of the full source.  We preserve
+this dependence by keeping a convex function of the coarse flux as the
+finer scales are removed.  Its evolution is the main object of the proof.
+
+\smallskip
+\paragraph{\textit{From empirical sampling to a Gaussian field.}}
+For a $K\times K$ grid in the unit square, let $c_z$ be the cell centers,
+let $G_z$ be independent standard Gaussians, and set
+\[
+\Gamma_K=\mathbb E\left\|
+\sum_z(G_z-\bar G)\delta_{c_z}\right\|_{\KR},
+\qquad \bar G=K^{-2}\sum_zG_z.
+\]
+Poissonization makes the cell counts independent.  Coupling these counts
+to Gaussians and transporting the balanced coupling error gives
+Lemma~\ref{lem:gaussianization-dyadic}:
+\[
+\left|A_N-\sqrt{N/K^2}\,\Gamma_K\right|
+\leq C\left(\sqrt N+\frac NK+K\sqrt{\log(2K)}\right).
+\]
+For a dyadic choice $K_N\asymp\sqrt N/(\log N)^a$, with $0<a<1/2$,
+these errors are negligible compared with $\sqrt{N\log N}$.
+Thus it suffices to prove
+\begin{equation}
+\frac{\Gamma_{2^J}}{2^J\sqrt{J\log2}}\longrightarrow\kappa.
+\tag{R}\label{eq:roadmap-gaussian-target}
+\end{equation}
+The relation $\log K_N/\log N\to1/2$ then accounts for the factor
+$1/\sqrt2$ in the empirical constant.
+
+\smallskip
+\paragraph{\textit{Removing fine scales changes the cost of the coarse flux.}}
+After dilation to $Q_{2^J}=[0,2^J]^2$ and spreading each Gaussian mass
+over its unit cell, we obtain a balanced density $\rho_{2^J}$.
+It is a sum of $J$ independent Haar details, each recording fluctuations
+between dyadic children and their parent.  The error in spreading the
+masses is $O(2^{2J})$, so the Gaussian target becomes
+\[
+\frac{\mathbb E\|\rho_{2^J}\|_{\KR}}{2^{2J}\sqrt{J\log2}}
+\longrightarrow\kappa.
+\]
+
+Suppose that the current cost of a flux $p\in\mathbb R^2$ is $\Psi(p)$.
+On a region where the coarse flux is almost constant, a fine source is
+transported by a correction $u$, and the cost is applied to $p+u$.
+Optimizing the fine correction and averaging over the fine source
+therefore produces a new function of $p$, rather than a single number.
+We denote this update by $\mathcal H_{h,L}\Psi$, where $h$ is the number
+of fine levels being removed and $L$ is an auxiliary cell period.
+Definition~\ref{def:cell-operator} constructs the update through the dual
+potential problem with compatible boundary values.
+
+The quantitative assertion behind this interpretation is
+\[
+\mathbb E J_\Psi^Q(\eta+\zeta)
+\approx\mathbb E J_{\mathcal H_{h,L}\Psi}^Q(\zeta).
+\]
+Here $J_\Psi^Q$ is the transport cost with integrand $\Psi$, $\eta$ is the
+fine source, and $\zeta$ is the independent coarse source.  The symbol
+$\approx$ denotes the explicit error in
+Lemma~\ref{lem:two-scale-scalarization}, not an exact identity.
+Starting from the Euclidean cost, repeated replacement gives
+\[
+\Phi_0(p)=|p|,\qquad \Phi_{k+1}=\mathcal H_{h,L}\Phi_k.
+\]
+After the last source is removed, the remaining flux has zero divergence
+and zero normal trace, hence zero mean.  Convexity then makes its minimum
+cost per unit area exactly $\Phi_m(0)$.  This explains why the original
+random optimization can be reduced to evaluating a deterministic
+iteration at the origin.
+
+\smallskip
+\paragraph{\textit{Scale separation and common boundary values justify the replacement.}}
+Two issues must be controlled in the preceding reduction.  The coarse
+flux must vary little on a fine cell, and independently optimized cell
+interiors must fit together.  To obtain the required separation, we keep
+groups of $h$ consecutive levels and omit $b$ levels between groups.
+Section~\ref{sec:dyadic} constructs a centered linear flux for each Haar
+detail, with zero normal trace and uniformly bounded pointwise second
+moment.  Independence gives an expected cost at most
+$C2^{2J}\sqrt D$ for any $D$ omitted levels.  Consequently, omitting
+$D=o(J)$ levels does not affect the desired limit.
+
+For the boundary issue, prescribing a mean slope alone does not specify
+the values of a potential along a shared face.  The cell operator retains
+the full boundary function, including the compatibility of opposite
+faces.  It chooses that boundary function after taking expectation, while
+the optimized interior may depend on the fine source.  The original
+optimizer can choose its boundary values using the fine source as well.
+Lemma~\ref{lem:finite-trace-net} controls this additional freedom by a
+finite approximation of the boundary functions and Gaussian concentration.
+The two-scale proof then smooths and freezes the coarse optimizer, inserts
+the cell optimizers, and joins them with an explicit error.  The primal
+flux formulation gives the upper bound and the dual potential formulation
+gives the lower bound.
+
+\smallskip
+\paragraph{\textit{The quadratic response determines the equation.}}
+To identify the evolution of $\Phi_k$, consider first a smooth convex cost
+near a background flux, with positive-definite Hessian $H$.  The
+quadratic model for a unit outer block is
+\[
+\mathbb E\inf_{-\operatorname{div}u=\eta_h,\ u\cdot n=0}
+\frac12\int_{Q_1}u^THu
+=\frac12\operatorname{Tr}\!\left(\Pi_h(L_H^N)^{-1}\right),
+\qquad L_H=-\operatorname{div}(H^{-1}\nabla).
+\]
+Here $\eta_h$ is the normalized $h$-level Gaussian band, $\Pi_h$ is its
+covariance projection, and $L_H^N$ has Neumann boundary conditions.
+The inverse matrix $H^{-1}$ appears because the dual quadratic cost is
+$\frac12\nabla f^TH^{-1}\nabla f$.
+In two dimensions the inverse elliptic eigenvalues have a logarithmic
+sum.  The covariance projection cuts this sum off at spatial resolution
+$2^{-h}$, and the elliptic eigenvalue count contributes
+$\sqrt{\det H}$.  Lemma~\ref{lem:grouped-quadratic-generator} computes
+the coefficient:
+\[
+\frac12\operatorname{Tr}\!\left(\Pi_h(L_H^N)^{-1}\right)
+=\frac{h\log2}{4\pi}\sqrt{\det H}+o(h).
+\]
+The Dirichlet quadratic problem has the same leading term.  These two
+problems bound the quadratic cell value, so the coefficient is independent
+of the auxiliary period $L$.
+
+The suggested generator is $\mathcal G(H)=(4\pi)^{-1}\sqrt{\det H}$,
+with a time increment $h\log2$ per group.  To justify this evolution,
+Section~\ref{sec:consistency} derives one-sided estimates
+on smooth tests.  The upper estimate uses a Neumann flux.  The lower
+estimate requires a Dirichlet potential whose gradient respects the
+Lipschitz constraint, followed by a global convex barrier that makes a
+local contact usable in the cell operator.  These estimates are formulated
+for viscosity tests because the iterated costs need not be smooth.
+
+\smallskip
+\paragraph{\textit{Diffusive rescaling and the accumulated error.}}
+The stability estimate $|p|\leq\Phi_k(p)\leq|p|+C\sqrt{kh}$ suggests
+rescaling both the cost and its flux variable by the square root of time.
+For a large time scale $r$, the relevant function is
+\[
+r^{-1/2}\Phi_{\lfloor sr/(h\log2)\rfloor}(\sqrt r\,q).
+\]
+For the spatial tests $\psi$ covered by Section~\ref{sec:consistency},
+the rescaled one-sided estimates have leading term
+$(h\log2/r)\mathcal G(D_q^2\psi)$, with time step $h\log2/r$.
+In the joint regime $h\to\infty$, $L\to\infty$, and $h/r\to0$,
+Lemma~\ref{lem:viscosity-limit} identifies its limit with $U(s,q)$.
+The consistency estimates give the equation; comparison in the convex
+class makes the limit unique.  In particular, at the retained time
+$t_J=mh\log2\sim J\log2$, this yields
+$\Phi_m(0)/\sqrt{t_J}\to U(1,0)$.
+
+The scale choices must make this limit compatible with all earlier
+replacements.  If $e_J$ is the error per unit area in one replacement,
+the required conditions are
+\[
+D=o(J),\qquad m e_J=o(\sqrt J),\qquad h/t_J\longrightarrow0.
+\]
+Section~\ref{sec:conclusion} uses $h=\lfloor J^{3/4}\rfloor$ and
+$b=\lceil(\log J)^2\rceil$, together with intermediate geometric scales,
+to verify these conditions in one sequence.  Thus
+\[
+2^{-2J}\mathbb E\|\rho_{2^J}\|_{\KR}
+=\Phi_m(0)+o(\sqrt J),
+\]
+which gives \eqref{eq:roadmap-gaussian-target} and then the empirical
+limit.
+
+\subsection{Viscosity formulation and notation}\label{subsec:solution-class}
+
+A convex cone-growth solution is a continuous function
+\(U:[0,\infty)\times\mathbb R^2\to\mathbb R\) whose spatial slices are convex
+and \(1\)-Lipschitz and which is nondecreasing in time.  On every finite time
+interval, \(U(s,q)-|q|\) is bounded uniformly in \(q\), and \(U\) has a
+spatially uniform time modulus.  We use the strong convex viscosity
+formulation: every smooth upper test satisfies the subsolution inequality,
+and every smooth lower test with positive-semidefinite spatial Hessian
+satisfies the supersolution inequality, including when that Hessian is
+singular.  Lemma~\ref{lem:viscosity-limit} records the precise formulation and
+proves comparison in this class.
+
+\smallskip
+\paragraph{\textit{Notation.}}
+We write \(Q_L=[0,L]^2\), so \(|Q_L|=L^2\), and all vector norms are
+Euclidean.  Constants denoted by \(C\) may change from line to line.  A vector
+measure on a square has zero normal trace when its extension by zero has no
+boundary divergence measure; this convention is made precise in
+Proposition~\ref{def:kr-beckmann}.  A source is \emph{balanced} on a square if
+its total mass there is zero.  We write \(B_r(a)\) for the Euclidean ball of
+radius \(r\) centered at \(a\), set \(B_r:=B_r(0)\), and write
+\(\mathbb S_+^2\) for the cone of symmetric
+positive-semidefinite \(2\times2\) matrices.
+
+\section{Transport formulation and Gaussian reduction}\label{sec:transport}
+
+We first express the empirical process as a transport cost and then compare
+it with a Gaussian grid.  The comparison keeps track of the grid size, so
+the eventual Gaussian limit will imply convergence for every integer $N$.
+
+\subsection{Transport costs and fluxes}
+
+\begin{proposition}[Transport costs and duality]\label{def:kr-beckmann}
+For a finite signed measure $\sigma$ of total mass zero on a bounded convex
+set $Q\subset\mathbb R^2$, put
+\begin{equation*}
+\|\sigma\|_ {\rm KR}
+:=\sup_ {\operatorname {Lip}(f)\leq1}\int_ Q f\,d\sigma .
+\end{equation*}
+Let $\mathcal M(Q;\mathbb R^2)$ be the vector Radon measures on
+$Q$.  For $v\in\mathcal M(Q;\mathbb R^2)$, denote its extension by
+zero to $\mathbb R^2$ by $\widetilde v$.  We write
+\begin{equation*}
+-\operatorname {div}v=\sigma,\qquad v\cdot n=0,
+\end{equation*}
+to mean the single distributional identity
+$-\operatorname {div}\widetilde v=\widetilde\sigma$ on
+$\mathbb R^2$.  Thus no boundary measure is present; this is the
+definition of zero normal trace used below.  Then
+\begin{equation}
+\|\sigma\|_ {\rm KR}
+=\inf\left\{|v|(Q):
+-\operatorname {div}v=\sigma,\quad v\cdot n=0\text{ on }\partial Q
+\right\}.
+\tag{1}
+\end{equation}
+More generally, for a convex function $\Psi:\mathbb R^2\to\mathbb R$
+with recession function $|\cdot|$, define
+\begin{equation*}
+J^Q_ \Psi(\sigma)
+:=\inf_ {-\operatorname {div}v=\sigma,\ v\cdot n=0}
+\left\{\int_ Q\Psi(v^a(x))\,dx+|v^s|(Q)\right\},
+\end{equation*}
+where $v=v^a\,dx+v^s$ is the Lebesgue decomposition.  This is the
+relaxation of the integral with linear growth.
+Its dual form is
+\begin{equation}
+J^Q_ \Psi(\sigma)
+=\sup_ {f\in C^1(\overline Q)}
+\left\{\int_ Q f\,d\sigma-\int_ Q\Psi^*(\nabla f)\right\}.
+\tag{2}
+\end{equation}
+The same value is obtained with $W^{1,\infty}(Q)$ potentials.
+
+\end{proposition}
+
+\begin{proof}
+We prove (2) by separating the relaxed primal epigraph and then take
+$\Psi(z)=|z|$ to obtain (1).  Working with vector measures retains
+singular fluxes and preserves the zero-normal-trace constraint under
+weak-* limits.  The required closedness is verified next.
+
+Set
+\begin{equation*}
+I(v)=\int_ Q\Psi(v^a)\,dx+|v^s|(Q).
+\end{equation*}
+The epigraph
+\begin{equation*}
+\mathscr E=\{(-\operatorname {div}\widetilde v,r):
+v\in\mathcal M(Q;\mathbb R^2),\ I(v)\leq r\}
+\end{equation*}
+is convex and closed for distributional convergence in the first
+coordinate and ordinary convergence in the second.  Indeed a bounded
+energy sequence is weak-* compact as measures, the divergence constraint
+passes to the limit, and the displayed relaxed integral is weak-* lower
+semicontinuous (this last assertion follows directly by writing it as
+the supremum of $\int a\cdot dv-\int\Psi^*(a)$ over continuous
+$a$).
+
+Separate $(\widetilde\sigma,r)$, with $r<\inf I$, from
+$\mathscr E$.  The separating distribution is a smooth test function
+$f$, and the coefficient of the epigraph coordinate is positive;
+normalize it to one.  Minimizing the resulting affine functional over
+absolutely continuous and singular parts of $v$ gives respectively
+$-\int\Psi^*(\nabla f)$ and the constraint $|\nabla f|\leq1$.
+This proves the reverse inequality in (2); integration by parts gives
+the forward inequality.  Approximation of Lipschitz functions by smooth
+ones on a convex square gives the $W^{1,\infty}$ version.  Taking
+$\Psi(z)=|z|$, for which $\Psi^*$ is the indicator of the closed unit
+ball, proves (1).
+
+\end{proof}
+
+\begin{lemma}[The empirical process as a transport cost]\label{lem:empirical-transport}
+Let
+\begin{equation*}
+\nu_ N=\sum_ {i=1}^N\delta_ {X_ i},\qquad \sigma_ N=\nu_ N-N\lambda,
+\end{equation*}
+and let $A_ N$ denote the expectation in Theorem~\ref{thm:intro-main}. Then
+\begin{equation}
+A_ N=\mathbb E\|\sigma_ N\|_ {\rm KR}
+=\mathbb E W_ 1(\nu_ N,N\lambda).
+\tag{3}
+\end{equation}
+
+\end{lemma}
+
+\begin{proof}
+For a fixed realization, the displayed empirical process is
+$\int f\,d\sigma_ N$. The Lipschitz class is invariant under $f\mapsto-f$,
+so the absolute value does not change the supremum. The last equality is
+the equal-mass Kantorovich--Rubinstein duality. 
+\end{proof}
+
+\subsection{Comparison with the Gaussian grid}
+
+\begin{definition}[Balanced Gaussian grid]\label{def:gaussian-grid}
+Partition $[0,1]^2$ into a $K\times K$ grid, let $c_ z$ be the cell
+centres, let $G_ z$ be independent standard Gaussians, and put
+\begin{equation}
+\bar G=K^{-2}\sum_ zG_ z,\qquad
+\Gamma_ K=\mathbb E\left\|
+\sum_ z(G_ z-\bar G)\delta_ {c_ z}\right\|_ {\rm KR}.
+\tag{4}
+\end{equation}
+
+Subtraction of $\bar G$ makes the total mass zero.
+
+\end{definition}
+
+\begin{lemma}[Quantitative Gaussian approximation]\label{lem:gaussianization-dyadic}
+Uniformly for $K^2\leq N$,
+\begin{equation}
+\left|A_ N-\sqrt{\frac N{K^2}}\,\Gamma_ K\right|
+\leq C\left(\sqrt N+\frac NK+K\sqrt{\log(2K)}\right).
+\tag{5}
+\end{equation}
+Consequently, it is enough to prove the existence of
+\begin{equation}
+\lim_ {J\to\infty}
+\frac{\Gamma_ {2^J}}{2^J\sqrt{J\log2}}.
+\tag{6}
+\end{equation}
+If this dyadic limit is $\gamma$, then
+\begin{equation}
+\lim_ {N\to\infty}\frac{A_ N}{\sqrt{N\log N}}
+=\frac\gamma{\sqrt2}.
+\tag{7}
+\end{equation}
+
+\end{lemma}
+
+\begin{proof}
+Poissonization and snapping produce independent cell counts at costs
+$O(\sqrt N)$ and $O(N/K)$.  After coupling these counts to Gaussians,
+we construct a grid flow for the balanced error; its energy controls the
+third term in (5).  The final choice of $K$ makes all three errors
+negligible on the scale $\sqrt{N\log N}$.
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Poissonize and snap to the grid.
+
+Write $\mu_ n=\sum_ {i=1}^n(\delta_ {X_ i}-\lambda)$.  Couple
+$M\sim\operatorname {Pois}(N)$ to the same infinite sample sequence.
+Since $\|\delta_ x-\lambda\|_ {\rm KR}\leq\operatorname {diam}Q_ 1$,
+\begin{equation}
+\mathbb E\|\mu_ N-\mu_ M\|_ {\rm KR}
+\leq C\mathbb E|M-N|\leq C\sqrt N.
+\tag{5a}
+\end{equation}
+Let $\lambda_ K=K^{-2}\sum_ z\delta_ {c_ z}$.  Replacing each
+$\delta_ {X_ i}-\lambda$ by
+$\delta_ {c(X_ i)}-\lambda_ K$ costs at most $C/K$.  Thus the expected
+snapping error in the Poissonized process is $CN/K$.
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Couple the Poisson counts to Gaussians.
+
+The cell counts $P_ z$ are now independent
+$\operatorname {Pois}(q)$ variables, $q=N/K^2$, while the balanced
+snapped measure is
+\begin{equation}
+\sum_ z(P_ z-\bar P)\delta_ {c_ z},\qquad
+\bar P=K^{-2}\sum_ zP_ z.
+\tag{5b}
+\end{equation}
+Put $Y_ z=P_ z-q$. Couple the $Y_ z$'s independently to
+$\sqrt q\,G_ z$
+with
+\begin{equation}
+\mathbb E|P_ z-q-\sqrt q\,G_ z|^2\leq C.
+\tag{8}
+\end{equation}
+We use the following normal-approximation estimate to obtain (8).
+
+\textbf{Normal-approximation result.} If $V_ n=\sum_ i\xi_ i$, the $\xi_ i$
+are independent and centred, and $\mathbb EV_ n^2=1$, then for every
+$p>1$
+\begin{equation*}
+W_ p(\mathcal L(V_ n),N(0,1))
+\leq C_ p\left(\sum_ i\mathbb E|\xi_ i|^{p+2}\right)^{1/p}.
+\end{equation*}
+Here $C_ p$ depends only continuously on $p$.
+
+This is Lemma 3.4 of Fang~\cite{Fang2019}, which restates Bobkov's Theorem 1.1. To check the hypotheses without a limiting argument, let
+$r=\lceil q\rceil$, $\theta=q/r\in[1/2,1]$, and use infinite divisibility to
+write $P_ q$ as a sum of $r$ independent $\mathrm {Pois}(\theta)$
+variables.  After normalization to variance one, the sum of fourth
+moments appearing in the $p=2$ estimate is
+$(1+3\theta)/q\leq4/q$.  Hence
+$W_ 2((P_ q-q)/\sqrt q,N(0,1))\leq C/\sqrt q$, which is exactly
+(8), uniformly for $q\geq1$.
+
+Let $e_ z=Y_ z-\sqrt qG_ z$ and
+$\widetilde e=e-\bar e\mathbf1$.  The couplings are independent and
+centred, so
+$\operatorname {Cov}(e)\leq CI$ and
+$\operatorname {Cov}(\widetilde e)\leq C\Pi_ 0$, where $\Pi_ 0$ is
+orthogonal projection off the constants.  Notice that projection is
+exactly what turns $Y_ z$ into $P_ z-\bar P$ and $G_ z$ into
+$G_ z-\bar G$; it introduces no unbalanced measure.
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Transport the balanced coupling error.
+
+The errors in (8) have uniformly bounded variances.  Summing their
+absolute values over $K^2$ cells would discard cancellation.  We instead
+use the discrete inverse Laplacian to construct a flow whose divergence
+is exactly the balanced error.
+
+Give
+the $K\times K$ nearest-neighbor grid unit edge weights and let
+$B:\mathbb R^E\to\mathbb R^{K^2}$ be its signed incidence matrix,
+$L=BB^T$.  The flow
+\begin{equation*}
+m=B^TL^+\widetilde e
+\end{equation*}
+satisfies $Bm=\widetilde e$.  Sending $|m_ e|$ units of mass along
+the corresponding Euclidean edge of length $1/K$ gives
+\begin{equation}
+\left\|\sum_ z\widetilde e_ z\delta_ {c_ z}\right\|_ {\rm KR}
+\leq K^{-1}\sum_ {e\in E}|m_ e|.
+\tag{5c}
+\end{equation}
+Moreover
+\begin{equation*}
+\mathbb E\|m\|_ 2^2
+=\operatorname {Tr}\!\left(B^TL^+\operatorname {Cov}(\widetilde e)
+L^+B\right)
+\leq C\operatorname {Tr}L^+.
+\end{equation*}
+For the path-grid Neumann Laplacian its nonzero eigenvalues are
+\begin{equation*}
+\lambda_{r,s}=4\sin^2\!\left(\frac{\pi r}{2K}\right)+4\sin^2\!\left(\frac{\pi s}{2K}\right),
+\end{equation*}
+with the evident one-axis variants.  Therefore
+\begin{equation}
+\operatorname {Tr}L^+
+\leq CK^2\sum_ {0\leq r,s<K,(r,s)\ne(0,0)}(r^2+s^2)^{-1}
+\leq CK^2\log(2K).
+\tag{5d}
+\end{equation}
+Since $|E|\leq2K^2$, Cauchy--Schwarz in (5c) yields expected KR error
+at most $CK\sqrt{\log(2K)}$.  Together with (5a) and the snapping
+bound this proves (5).
+
+\smallskip\noindent
+\underline{\textit{Step 4.}} Choose the dyadic grid scale and return to $A_N$.
+
+Fix $0<a<1/2$. For every $N$, choose a dyadic integer $K_ N$ such
+that
+\begin{equation*}
+K_ N\leq\frac{\sqrt N}{(\log N)^a}<2K_ N.
+\end{equation*}
+All three errors in (5) are $o(\sqrt{N\log N})$, while
+$\log K_ N/\log N\to1/2$.  Substitution of (6) into (5) therefore
+proves (7), completing the reduction from the empirical problem to the
+dyadic Gaussian limit.
+
+\end{proof}
+
+\subsection{From Gaussian atoms to a cellwise density}
+
+The next comparison puts the Gaussian field on a square with unit cells,
+where its dyadic decomposition is convenient.  The resulting error is of
+lower order than the target cost $K^2\sqrt{\log K}$.
+
+\begin{lemma}[Spreading the Gaussian masses over cells]\label{lem:atom-to-cell}
+Let $\widehat\Gamma_ K$ be the Gaussian KR expectation after dilating the
+unit square and the grid by $K$. Thus
+\begin{equation*}
+\widehat\Gamma_ K=K\Gamma_ K.
+\end{equation*}
+Let $C_ z=z+[0,1)^2\subset Q_ K$ and set
+\begin{equation*}
+\rho_ K(x)=\sum_ z(G_ z-\bar G)\mathbf1_ {C_ z}(x).
+\end{equation*}
+Then
+\begin{equation}
+\left|\widehat\Gamma_ K-
+\mathbb E\|\rho_ K\|_ {\rm KR,Q_ K}\right|\leq CK^2.
+\tag{9}
+\end{equation}
+
+\end{lemma}
+
+\begin{proof}
+Dilation multiplies every transport distance by $K$, proving the first
+identity. For each cell, move its signed mass between the centre and the
+uniform measure on that cell. This costs at most
+$C|G_ z-\bar G|$. Summing and taking expectations proves (9).
+
+\end{proof}
+
+\section{Dyadic decomposition and scale grouping}\label{sec:dyadic}
+
+We group the Gaussian density into independent bands of dyadic scales.
+Each band has the same law after its outer blocks are rescaled to unit
+squares.  To separate consecutive retained bands, we will omit some Haar
+levels; the estimate below shows that the resulting cost grows only as
+the square root of their number.  Its proof constructs local fluxes whose
+pointwise second moments also control the later cell comparisons.
+
+\begin{lemma}[Independent Haar bands and the cost of omitted levels]\label{lem:dyadic-bands}
+Assume $K=2^J$. On cellwise-constant functions in $Q_ K$, let $P_ j$
+be conditional expectation on dyadic squares of side $2^j$. Then
+\begin{equation}
+\rho_ K=\sum_ {j=0}^{J-1}\xi_ j,
+\qquad \xi_ j=(P_ j-P_ {j+1})G,
+\tag{10}
+\end{equation}
+and the $\xi_ j$ are independent Gaussian fields.
+
+If $h\geq1$, then a group
+$\eta_ {r,h}=(P_ r-P_ {r+h})G$ is balanced on every dyadic square of side
+$2^{r+h}$, and different such outer squares carry independent copies.
+After rescaling an outer square to the unit square, its source is
+\begin{equation}
+\eta_ h=n\sum_ {C\in\mathcal P_ n}(Z_ C-\bar Z)\mathbf1_ C,
+\qquad n=2^h,
+\tag{11}
+\end{equation}
+where $\mathcal P_ n$ is the $n\times n$ partition into cells of side
+$1/n$, the $Z_ C$ are i.i.d. $N(0,1)$, and
+$\bar Z=n^{-2}\sum_ CZ_ C$. In particular, the rescaled law depends on
+$h$, but not on $r$.
+
+We call a square of side $2^{r+h}$ on which $\eta_{r,h}$ is balanced an
+\emph{outer block} of the band.  After rescaling, an outer block has side
+one and contains $2^h\times2^h$ fine cells.
+
+If $D$ dyadic levels are omitted, their sum $\zeta_ D$ satisfies
+\begin{equation}
+\mathbb E\|\zeta_ D\|_ {\rm KR,Q_ K}\leq CK^2\sqrt D.
+\tag{12}
+\end{equation}
+
+\end{lemma}
+
+\begin{proof}
+By (1), it suffices to construct a flux for the omitted levels with
+expected $L^1$ norm at most $CK^2\sqrt D$.  We construct a zero-normal
+flux for each Haar detail and use independence to add its second moment
+across levels.  First we identify the law of each band.
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Decompose the field into independent dyadic bands.
+
+The spaces $\operatorname {ran}(P_ j-P_ {j+1})$ are mutually orthogonal.
+Orthogonal projections of a Gaussian vector are independent, proving
+(10). The balance and independence assertions follow directly from the
+definition of conditional expectation. Under $x=2^{r+h}y$, fluxes are
+unchanged in dimension two and source densities acquire the factor
+$2^{r+h}$; this gives exactly (11).
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Construct a local right inverse on one Haar parent.
+
+The local flux must solve the divergence equation and have matching
+normal components at every child interface; otherwise pasting would
+create an additional source there.  Work on one level-$j$ parent
+$B=x_ 0+[0,2\ell)^2$, $\ell=2^j$.  Denote its four child averages by
+$A_ {\sigma\tau}$, where $\sigma=1$ means left, $\tau=1$ means lower,
+and $\sigma,\tau\in\{-1,1\}$.  They are independent
+$N(0,\ell^{-2})$.  Put
+\begin{equation*}
+\alpha=\frac14\sum_ {\sigma,\tau}\sigma A_ {\sigma\tau},\qquad
+\beta =\frac14\sum_ {\sigma,\tau}\tau A_ {\sigma\tau},\qquad
+\gamma=\frac14\sum_ {\sigma,\tau}\sigma\tau A_ {\sigma\tau}.
+\end{equation*}
+Thus $\alpha,\beta,\gamma$ are independent and each has variance
+$(4\ell^2)^{-1}$.  Let $s_ \ell=1$ on $[0,\ell)$ and $-1$ on
+$[\ell,2\ell)$, and let
+\begin{equation*}
+\tau_ \ell(t)=\begin{cases}t,&0\leq t\leq\ell,\\
+2\ell-t,&\ell<t\leq2\ell,
+\end{cases}
+\qquad \tau_ \ell'=s_ \ell\quad\hbox{a.e.}
+\end{equation*}
+The Haar detail on $B$ is
+\begin{equation*}
+\xi_ j=\alpha s_ \ell(x_ 1-x_ {0,1})+\beta s_ \ell(x_ 2-x_ {0,2})
++\gamma s_ \ell(x_ 1-x_ {0,1})s_ \ell(x_ 2-x_ {0,2}),
+\end{equation*}
+and define
+\begin{equation}
+\begin{split}
+(R_ j\xi_ j)_ 1(x)&=-\tau_ \ell(x_ 1-x_ {0,1})
+\{\alpha+\gamma s_ \ell(x_ 2-x_ {0,2})\},\\
+(R_ j\xi_ j)_ 2(x)&=-\beta\tau_ \ell(x_ 2-x_ {0,2}).
+\end{split}
+\tag{12a}
+\end{equation}
+Direct differentiation gives $-\operatorname {div}R_ j\xi_ j=\xi_ j$.
+The first component vanishes on the two vertical parent faces and the
+second on the two horizontal parent faces, so the outer normal trace is
+zero.  At the internal vertical child interface the normal first
+component is continuous; at the internal horizontal interface the normal
+second component is continuous, while only the tangential first component
+jumps.  Hence there is no interface measure in the divergence.
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Paste the local fields and retain a pointwise bound.
+
+Paste (12a) over all level-$j$ parents.  Across a common parent face both
+normal traces are zero, so the pasted field lies in
+$H(\operatorname {div})$ and again creates no interface source.  Choose
+the representative zero on the union of dyadic interfaces.  Since
+$0\leq\tau_ \ell\leq\ell$, at every point
+\begin{equation}
+\mathbb E|R_ j\xi_ j(x)|^2\leq \frac34,\qquad
+\mathbb E\int_ {\text{parent}}|R_ j\xi_ j|^2\leq C\ell^2.
+\tag{12b}
+\end{equation}
+The Gaussian Haar projections at different levels are orthogonal and
+therefore independent; $R_ j$ is deterministic and linear.  Consequently,
+for every set $I$ of levels,
+\begin{equation}
+\sup_ x\mathbb E\left|\sum_ {j\in I}R_ j\xi_ j(x)\right|^2
+=\sup_ x\sum_ {j\in I}\mathbb E|R_ j\xi_ j(x)|^2
+\leq C|I|.
+\tag{12c}
+\end{equation}
+The pointwise estimate (12c), including the chosen representatives at
+interfaces, is used in (16), (17), and (22).  The construction is unchanged
+by dilation of an outer block: fluxes are scale invariant in dimension two.
+
+\smallskip\noindent
+\underline{\textit{Step 4.}} Sum the omitted levels and conclude the KR estimate.
+
+For the $D$ omitted levels, the same independence gives
+\begin{equation*}
+\mathbb E\int_ {Q_ K}\left|\sum_ {j\ {\rm omitted}}R_ j\xi_ j\right|^2
+=\sum_ {j\ {\rm omitted}}\mathbb E\int_ {Q_ K}|R_ j\xi_ j|^2
+\leq CDK^2.
+\end{equation*}
+Jensen followed by Cauchy--Schwarz in space bounds the expected
+$L^1$ norm by $CK^2\sqrt D$.  Formula (1) now gives (12), completing
+the proof.
+
+\end{proof}
+
+\section{The nonlinear cell operator}\label{sec:cell-operator}
+
+After the finer scales have been treated, their contribution is encoded
+by a convex cost profile $\Psi(p)$ for a base flux $p$.  The operator
+defined below incorporates one more Haar band and returns the updated
+profile.  We define it through the dual potential: first prescribe its
+values on all four cell faces, optimize the interior for each fine-source
+realization, and take expectation; only then optimize the boundary trace.
+This order keeps the trace deterministic with respect to the fine source.
+The next subsection estimates the gain from allowing that trace to depend
+on the fine source.
+
+\subsection{Definition and basic properties}
+
+\begin{definition}[Cell operator]\label{def:cell-operator}
+Let $\mathscr P_ M$ be the class of convex functions
+$\Psi:\mathbb R^2\to\mathbb R$ satisfying
+\begin{equation}
+|p|\leq\Psi(p)\leq |p|+M.
+\tag{13}
+\end{equation}
+We call the members of $\mathscr P_M$ \emph{linear-growth profiles}.
+Every member of $\mathscr P_ M$ is $1$-Lipschitz, and
+\begin{equation}
+-M\leq\Psi^*(a)\leq0\quad (|a|\leq1),\qquad
+\Psi^*(a)=+\infty\quad (|a|>1).
+\tag{14}
+\end{equation}
+
+For an integer $L\geq1$, tile $Q_ L$ by unit squares (the normalized outer
+blocks) and put an independent copy of (11) in each square; call the resulting
+source $\eta_ h^{(L)}$.  To retain the boundary data needed for pasting
+cell interiors, let
+$\mathcal T_ L$ be the restrictions to all four faces of $\partial Q_ L$
+of $1$-Lipschitz functions on $Q_ L$, modulo constants and represented
+by the normalization $c(0)=0$.  Since $Q_ L$ is convex, McShane
+extension shows that this is exactly the compact set of anchored
+$1$-Lipschitz boundary functions.
+
+The slope $a$ will record the mean gradient of the dual potential.
+For $|a|\leq1$, let $\mathcal A_ L(a)$ be the functions
+$F\in W^{1,\infty}_ {\rm loc}(\mathbb R^2)$ satisfying
+\begin{equation}
+|\nabla F|\leq1,\qquad
+F(x+Le_ i)=F(x)+La_ i\quad(i=1,2),\qquad F(0)=0.
+\tag{14a}
+\end{equation}
+Let $\mathcal T_ L^{\rm per}(a)\subset\mathcal T_ L$ be the restrictions
+of these functions to all four faces of $\partial Q_ L$.  A
+\emph{complete affine-periodic trace} records the actual height on every
+face, the opposite-face increment relations $F(x+Le_i)-F(x)=La_i$,
+and the corner compatibility.  These are the data that allow one cell
+extension to be repeated over the plane.  For every $c\in\mathcal T_ L$,
+let
+\begin{equation}
+K_ {h,L,\Psi}(c)=\mathbb E\sup_ {\substack{F|_ {\partial Q_ L}=c\\
+|\nabla F|\leq1}}
+\left\{\int_ {Q_ L}F\eta_ h^{(L)}
+-\int_ {Q_ L}\Psi^*(\nabla F)\right\}.
+\tag{15}
+\end{equation}
+The source has zero total mass, so adding a constant to $c$ leaves this
+value unchanged.  The best expected cell value at slope $a$ and the
+updated cost at base flux $p$ are, respectively,
+\begin{equation}
+\mathcal R_ {h,L,\Psi}(a)=L^{-2}
+\max_ {c\in\mathcal T_ L^{\rm per}(a)}K_ {h,L,\Psi}(c),\qquad
+(\mathcal H_ {h,L}\Psi)(p)
+=\sup_ {|a|\leq1}\{p\cdot a+\mathcal R_ {h,L,\Psi}(a)\}.
+\tag{16}
+\end{equation}
+When $h,L,\Psi$ are fixed, we abbreviate
+$\mathcal R=\mathcal R_{h,L,\Psi}$.
+
+\smallskip\noindent\emph{Extension to a compact slope domain.} Let
+$\Psi$ be proper closed convex and suppose
+$K_ \Psi=\operatorname {dom}\Psi^*\Subset B_ 1$ is compact and
+$\Psi^*$ is finite and continuous on $K_ \Psi$.  In (15), retain the
+same ambient trace space but interpret the value as $-\infty$ unless
+the trace has an extension with
+$\nabla F(x)\in K_ \Psi$ almost everywhere; equivalently the extended
+integrand $\Psi^*=+\infty$ off $K_ \Psi$ enforces this condition.
+In (16), set $\mathcal R(a)=-\infty$ for $a\notin K_ \Psi$.  These conventions
+define $\mathcal H_ {h,L}\Psi=(-\mathcal R)^*$.  This extension is used only for the strict-slope lower barrier in
+Lemma~\ref{lem:viscosity-limit}.
+
+\end{definition}
+
+\begin{proposition}[Properties of the cell operator]\label{prop:cell-operator-properties}
+On the linear-growth class in Definition~\ref{def:cell-operator}, the map $\mathcal H_ {h,L}$ is order preserving,
+commutes with addition of constants, is a contraction in the uniform
+norm, and maps convex $1$-Lipschitz profiles to convex
+$1$-Lipschitz profiles.  Moreover,
+\begin{equation}
+\Psi\leq\mathcal H_ {h,L}\Psi\leq\Psi+C\sqrt h.
+\tag{16a}
+\end{equation}
+The bound is uniform in $L$.  If $\Psi$ is invariant under the dihedral group
+$D_ 4$ of the square, so is $\mathcal H_ {h,L}\Psi$.
+On the extension to a compact slope domain in Definition~\ref{def:cell-operator},
+the map is also order preserving and constant-equivariant.
+\end{proposition}
+
+\begin{proof}
+We first establish the variational properties on $\mathscr P_M$ and
+bound the update by the expected size of a Haar flux.  We then verify
+that the same definition remains well posed on a compact slope domain.
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Establish the variational properties on $\mathscr P_M$.
+
+The bounds in (14) follow from (13) and convex conjugacy. A convex
+function whose recession function is $|\cdot|$ has all subgradients in
+the closed unit ball and is therefore $1$-Lipschitz.
+
+The space $\mathcal T_ L$, and the closed set of pairs $(a,c)$, with
+$|a|\leq1$ and $c\in\mathcal T_ L^{\rm per}(a)$, are compact in the
+uniform topology by Arzela--Ascoli.  Repeating a trace and any one of its
+cell extensions produces a continuous piecewise $W^{1,\infty}$ function
+on the plane; its weak gradient has norm at most one, so it is globally
+$1$-Lipschitz.  Thus the boundary cocycle conditions are also sufficient,
+not only necessary.  For fixed trace, the admissible interior potentials are
+also compact after normalization.  The linear source term is uniformly
+continuous and $F\mapsto-\int\Psi^*(\nabla F)$ is upper
+semicontinuous under weak-* convergence in $W^{1,\infty}$.  Hence the
+two maxima in (15)--(16) are attained.  Mixing traces and
+near-optimizing interiors shows that $\mathcal R$ is concave and upper
+semicontinuous. Thus (16) is convex and $1$-Lipschitz and
+$(\mathcal H_ {h,L}\Psi)^*=-\mathcal R$ on the closed unit ball.  If
+$\Psi\leq\Phi$, then $\Psi^*\geq\Phi^*$, which proves order
+preservation; the constant rule and contraction follow in the same way.
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Bound the update and preserve the symmetries.
+
+The affine trace $F(x)=a\cdot x$ gives
+$\mathcal R(a)\geq-\Psi^*(a)$, so biconjugacy gives the lower bound in
+(16a).  For the upper bound, we convert the source pairing into a perturbation
+of the base flux.  Paste on the unit outer blocks the linear zero-normal
+flux $Q$ from (12a), so that
+$-\operatorname {div}Q=\eta_ h^{(L)}$,
+$\mathbb E Q(x)=0$, and
+$\sup_ x\mathbb E|Q(x)|^2\leq Ch$.  For every affine-cocycle potential
+$F$ of slope $a$, integration by parts and
+$\fint\nabla F=a$ give
+\begin{equation}
+p\cdot a+L^{-2}\left(\int F\eta_ h^{(L)}-
+\int\Psi^*(\nabla F)\right)
+=\fint\bigl[(p+Q)\cdot\nabla F-\Psi^*(\nabla F)\bigr]
+\leq\fint\Psi(p+Q).
+\tag{16b}
+\end{equation}
+
+Taking the fixed-trace maximum and expectation in (16b), then using that
+$\Psi$ is $1$-Lipschitz, yields
+\begin{equation}
+(\mathcal H_ {h,L}\Psi)(p)
+\leq\mathbb E\fint\Psi(p+Q)\leq\Psi(p)+C\sqrt h.
+\tag{16c}
+\end{equation}
+This proves (16a) directly from the dual cell problem.
+The same argument, without the $p$-term, also gives
+\begin{equation}
+0\leq L^{-2}K_ {h,L,\Psi}(c)\leq C(M+\sqrt h),
+\qquad 0\leq \mathcal R_ {h,L,\Psi}(a)\leq C(M+\sqrt h).
+\tag{16d}
+\end{equation}
+For the lower bound, use any deterministic extension of $c$: its
+expected source pairing is zero and $-\Psi^*\geq0$.  The upper bound
+follows from integration by parts against the pasted local flux $Q$
+and Fenchel's inequality.  These estimates also imply the integrable
+domination needed when traces converge.
+
+Applying a coordinate reflection or permutation simultaneously to the
+source, flux, and trace preserves their laws and the variational value;
+this proves the $D_ 4$-invariance assertion.
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Treat a compact slope domain.
+
+The additional issue is to retain the constraint
+$\nabla F\in K_\Psi$ when traces and interior potentials converge.
+Write $g=\Psi^*$, extended by
+$+\infty$ off $K_ \Psi$.  The compatible traces, and the set of
+compatible affine-cocycle pairs $(a,c)$, are closed.  Indeed, if
+$F_ n$ are normalized extensions with
+$\nabla F_ n\in K_ \Psi$, uniform convergence and weak-* compactness in
+$W^{1,\infty}$ give an extension $F$.  For every affine functional
+$\ell$ nonpositive on $K_ \Psi$, weak-* passage in
+$\int_ E\ell(\nabla F_ n)$ gives
+$\int_ E\ell(\nabla F)\leq0$ for every measurable $E$;
+finite-dimensional separation therefore gives
+$\nabla F\in K_ \Psi$ almost everywhere.  The trace and cocycle
+identities pass to the limit.  Thus both compatible sets are compact.
+
+The functional $\int g(\nabla F)$ is weak-* lower semicontinuous, so
+the payoff in (15) is upper semicontinuous and the fixed-trace maximum
+is attained.  For a fixed source its value is upper semicontinuous in
+the compatible trace: take maximizing extensions along a convergent
+sequence of traces and use the preceding compactness.  The maximum is
+measurable in the finite Gaussian coefficient vector by the measurable
+maximum theorem.  Moreover, after anchoring one value,
+\begin{equation}
+\left|\max_ F\left\{\int F\eta_ h^{(L)}-\int g(\nabla F)\right\}\right|
+\leq C_ {K_ \Psi,L,g}\bigl(1+\|\eta_ h^{(L)}\|_ {L^1(Q_ L)}\bigr),
+\tag{16s}
+\end{equation}
+uniformly over compatible traces.  The right side is integrable.
+Reverse Fatou therefore shows that the expected fixed-trace value is
+upper semicontinuous.  Compactness of the affine-cocycle pairs now
+proves attainment and upper semicontinuity of the outer maximum
+defining $\mathcal R$.
+
+Convex combinations of compatible potentials remain compatible, and
+the payoff is concave in the potential.  Mixing affine-cocycle
+potentials proves that $\mathcal R$ is concave.  Every compatible potential of
+slope $a$ satisfies
+\begin{equation*}
+a=\fint_ {Q_ L}\nabla F\in K_ \Psi,
+\end{equation*}
+whereas $F(x)=a\cdot x$ is compatible for every $a\in K_ \Psi$.
+Consequently $\mathcal R$ is finite precisely on $K_ \Psi$, is
+upper semicontinuous there, and equals $-\infty$ off it.  Hence
+$-\mathcal R$ is a proper closed convex extended-real function and
+$\mathcal H_ {h,L}\Psi=(-\mathcal R)^*$, as asserted.
+
+Incompatible traces have value $-\infty$.  Thus, if
+$\Psi\leq\Phi$, extended-real conjugacy gives
+$\Psi^*\geq\Phi^*$ pointwise even when their compact domains differ;
+the payoff inequality may be maximized over the common ambient trace
+space and proves successively the order of the fixed-trace values,
+$\mathcal R$, and $\mathcal H$.  Finally
+$(\Psi+C)^*=\Psi^*-C$, which proves constant equivariance.
+
+\end{proof}
+
+\subsection{A finite approximation of common boundary traces}
+
+A global optimizing potential can use the fine source to choose its trace
+on every cell boundary.  To compare this value with the cell operator,
+we approximate all of those boundary values simultaneously by a finite
+family of compatible traces.  For each fixed trace the cell interiors
+optimize separately, and Gaussian concentration bounds the gain from
+choosing the trace after seeing the source.  The lemma is stated for a
+constant base flux; the proof also records the conditional estimates
+needed when that constant is chosen from an independent coarse field.
+
+\begin{lemma}[Common-trace comparison]\label{lem:finite-trace-net}
+Fix an $h$-level source and a convex profile $\Psi\in\mathscr P_ M$.
+Let $\Omega=Q_ R$, with $R/L$ an integer, and let $\Sigma_ L$ be
+the union of all boundaries of its $L$-squares.  A complete common
+trace means the restriction of one global $1$-Lipschitz potential to
+all of $\Sigma_ L$, modulo one additive constant; denote this compact
+trace space by $\mathfrak T_ {\Omega,L}$.  Let $\eta$ consist of independent
+copies of $\eta_h^{(L)}$ in these cells.  Fix a deterministic constant
+base vector $p\in\mathbb R^2$ and define
+\begin{equation}
+\mathcal V_ {\Omega}(p,\eta)=
+\sup_ {\substack{F\in W^{1,\infty}(\Omega),\ |\nabla F|\leq1\\F(0)=0}}
+\left\{\int_ \Omega F\eta+\int_ \Omega p\cdot\nabla F
+-\int_ \Omega\Psi^*(\nabla F)\right\}.
+\tag{17a}
+\end{equation}
+
+For $c\in\mathfrak T_ {\Omega,L}$, let
+$\mathcal V_ c(p,\eta)$ be (17a) with $F|_ {\Sigma_ L}=c$.
+If $D$ is an $L$-cell, write $c_ D$ for
+the restricted trace and
+\begin{equation}
+m_ D(c)=\int_ D\nabla F
+=\int_ {\partial D}c_ D\,n\,d\mathcal H^1,
+\tag{17b}
+\end{equation}
+which depends only on the trace.  After translation to the reference
+cell we denote the same quantity by $m_ L(c_ D)$.  For
+$0<\varepsilon<1/10$ there is
+a finite net $\mathcal N\subset\mathfrak T_ {\Omega,L}$ such that
+\begin{equation}
+\begin{split}
+\mathbb E\mathcal V_ \Omega(p,\eta)
+\leq{}&\max_ {c\in\mathcal N}
+\sum_ D\{p\cdot m_ D(c)+K_ {h,L,\Psi}(c_ D)\}\\
+&+|\Omega|\left[
+C(M+|p|+\sqrt h)\left(\varepsilon+\frac1{\varepsilon L}\right)
++C\sqrt{\frac{\log(C/\varepsilon)}L}\right].                   
+\end{split}
+\tag{17}
+\end{equation}
+Conversely, for every deterministic common trace $c$,
+\begin{equation}
+\mathbb E\mathcal V_ \Omega(p,\eta)
+\geq\sum_ D\{p\cdot m_ D(c)+K_ {h,L,\Psi}(c_ D)\}.
+\tag{17c}
+\end{equation}
+In Lemma~\ref{lem:two-scale-scalarization}, the coarse field is first
+frozen to a constant $p_D$ on each block before this estimate is applied.
+
+For a fixed $L$-cell and an affine cocycle $a$, let $K(c)$ be the
+expected optimized fine dual value with complete boundary trace $c$.
+Then $K$ is concave in $c$. If
+\begin{equation}
+\mathcal R(a)=L^{-2}\max\{K(c):c\text{ has affine-periodic slope }a\},
+\qquad |a|\leq1,
+\tag{18}
+\end{equation}
+then $\mathcal R$ is concave and upper semicontinuous and
+\begin{equation}
+H(p)=\sup_ {|a|\leq1}\{p\cdot a+\mathcal R(a)\},\qquad H^*=-\mathcal R
+\ \hbox{ on }\overline B_ 1.
+\tag{19}
+\end{equation}
+With the notation of Definition~\ref{def:cell-operator},
+$H=\mathcal H_ {h,L}\Psi$ exactly.  The cell size remains finite throughout this comparison.
+
+\end{lemma}
+
+\begin{proof}
+We prove (17) by approximating the random trace and then comparing the
+maximum over that finite family with its expected fixed-trace values.
+To make its later conditional use explicit, we carry out the construction
+with an independent coarse field.
+
+On a coarse probability space let $P$ be a strongly
+$L^1(\Omega;\mathbb R^2)$-measurable field with
+$\mathbb E\int_ \Omega|P|<\infty$.  Independently, on a product fine
+probability space, put independent copies $\eta_ D$ of the active
+fine source in the $L$-cells and set $\eta=\sum_ D\eta_ D$.  With
+\begin{equation*}
+\mathscr A_ \Omega=\{F\in C(\overline\Omega):F(0)=0,
+\operatorname {Lip}(F)\leq1\},
+\end{equation*}
+set
+\begin{equation}
+\mathcal V_ \Omega(P,\eta)=
+\max_ {F\in\mathscr A_ \Omega}
+\left\{\langle\eta,F\rangle+
+\int_ \Omega P\cdot\nabla F-
+\int_ \Omega\Psi^*(\nabla F)\right\},\qquad
+\mathbf D_ {R,L}=\mathbb E_ P\mathbb E_ \eta
+\mathcal V_ \Omega(P,\eta).
+\tag{17a'}
+\end{equation}
+The maximum is the free-outer-boundary dual problem; no periodic outer
+trace is imposed.  The displayed integrability assumption and the
+canonical fine flux bound make $\mathbf D_ {R,L}$ finite.
+
+Let $\mathcal V_c(P,\eta)$ denote (17a') with
+$F|_{\Sigma_L}=c$.  For $P\equiv p$, these definitions agree with
+those in the statement.
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Construct a finite family of compatible traces.
+
+By (2), $\mathcal V_ \Omega$ is exactly the free-boundary dual
+supremum in (17a').
+Writing the fine balanced source as $-\operatorname {div}Q$, its
+objective is
+\begin{equation}
+\sup_ F\int\bigl[(P+Q)\cdot\nabla F-\Psi^*(\nabla F)\bigr],
+\qquad |\nabla F|\leq1.
+\tag{20}
+\end{equation}
+Rounding and interpolating each face separately would not ensure agreement
+at junctions or compatibility around cycles.  We therefore round values
+on the whole skeleton and use one McShane extension.  The preliminary
+contraction by $\theta=1-4\varepsilon$ supplies the slack for rounding.
+
+Normalize $F$ at one skeleton vertex.  Scale it by
+$\theta=1-4\varepsilon$, sample $\Sigma_ L$ at unit spacing (including
+every junction), and round the sampled values to a lattice of mesh
+$\varepsilon/8$.  Distinct sample vertices have Euclidean distance at
+least one, and therefore their rounded values $q(v)$ satisfy
+\begin{equation*}
+|q(v)-q(w)|\leq\theta|v-w|+\varepsilon/4
+\leq(1-2\varepsilon)|v-w|.
+\end{equation*}
+Define the whole skeleton trace, rather than interpolating face by face, by
+\begin{equation}
+c_ q(x)=\inf_ v\{q(v)+(1-2\varepsilon)|x-v|\},
+\qquad x\in\Sigma_ L.
+\tag{20a}
+\end{equation}
+This McShane formula agrees with the node data and is globally
+$(1-2\varepsilon)$-Lipschitz in the Euclidean metric, so every cycle,
+junction, and seam compatibility is automatic.  Comparison with the
+nearest node on the same unit skeleton edge gives
+$\|c_ q-\theta F\|_ {L^\infty(\Sigma_ L)}\leq1$.
+These traces form the net $\mathcal N$.
+The skeleton graph has at most $C|\Omega|/L$ unit edges.  Once one
+anchor is fixed, each new vertex has at most $C/\varepsilon$ possible
+increments (cycle constraints only reduce this number).  Hence
+\begin{equation}
+\log|\mathcal N|
+\leq C\frac{|\Omega|}{L}\log(C/\varepsilon).
+\tag{21}
+\end{equation}
+\smallskip\noindent
+\underline{\textit{Step 2.}} Match the optimizer to the common trace.
+
+Preserve the entire scaled optimizer on the core at distance
+$r=C/\varepsilon$ from the skeleton. For a core
+point $x$ and a skeleton point $y$,
+\begin{equation*}
+|F_ {\rm core}(x)-F_ {\rm skel}(y)|
+\leq C+(1-4\varepsilon)|x-y|\leq(1-\varepsilon)|x-y|.
+\end{equation*}
+Thus the union of all core data and the common skeleton trace has a
+McShane $1$-Lipschitz extension.  Fine sources in the intervening
+corridors are compared using their canonical unit-block zero-normal
+fluxes.  Let $\mathcal C_ {\Omega,L,\varepsilon}$ be the resulting
+union of whole unit outer blocks.  It has deterministic relative area at most
+$C/(\varepsilon L)$, and, because every unit-outer-block source is balanced,
+\begin{equation}
+\mathbb E_ \eta\int_ {\mathcal C_ {\Omega,L,\varepsilon}}|Q|
+\leq C|\Omega|\frac{\sqrt h}{\varepsilon L}.
+\tag{21a}
+\end{equation}
+On the core, concavity of $-\Psi^*$, together with
+$-M\leq\Psi^*\leq0$, bounds the loss by
+$C\varepsilon(M+|P|+|Q|)$.  On the corridor, both old and new
+integrands have magnitude at most $|P|+|Q|+M$.  Consequently this modification
+gives, for every realized coarse field $P$,
+\begin{equation}
+\begin{split}
+0\leq{}&\mathbb E_ \eta[\mathcal V_ \Omega(P,\eta)
+-\max_ {c\in\mathcal N}\mathcal V_ c(P,\eta)\mid P]\\
+\leq{}&C|\Omega|(M+\sqrt h)
+\left(\varepsilon+\frac1{\varepsilon L}\right)
++C\varepsilon\int_ \Omega|P|
++C\int_ {\mathcal C_ {\Omega,L,\varepsilon}}|P|.          
+\end{split}
+\tag{21a'}
+\end{equation}
+The last two terms retain the spatial dependence of the realized field
+$P$.  If
+$\sup_ x\mathbb E|P(x)|\leq C\sqrt T$, only now averaging in $P$
+and using the deterministic corridor fraction turns the last two terms
+into $C|\Omega|\sqrt T(\varepsilon+1/(\varepsilon L))$.  For
+$P\equiv p$, the same calculation gives the geometric error in (17).
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Decompose the fixed-trace problem cell by cell.
+
+For a realized coarse field $P$, put
+\begin{equation*}
+\begin{aligned}
+Y_ D(P,c_ D;\eta_ D)&=
+\max_ {\substack{F_ D|_ {\partial D}=c_ D\\|\nabla F_ D|\leq1}}
+\left\{\langle\eta_ D,F_ D\rangle+
+\int_ DP\cdot\nabla F_ D-\int_ D\Psi^*(\nabla F_ D)\right\},\\
+K_ {D,P}(c_ D)&=\mathbb E_ {\eta_ D}Y_ D(P,c_ D;\eta_ D).
+\end{aligned}
+\end{equation*}
+Every family of cell interiors with one complete common trace pastes to
+a global $1$-Lipschitz function: restrict the straight segment between
+two points to its successive cell pieces and sum the cellwise Lipschitz
+bounds.  Conversely every global potential restricts to such a family.
+Thus, realization by realization,
+\begin{equation}
+\mathcal V_ \Omega(P,\eta)
+=\max_ {c\in\mathfrak T_ {\Omega,L}}\sum_ DY_ D(P,c_ D;\eta_ D),
+\qquad
+\mathbb E_ \eta[\mathcal V_ c(P,\eta)\mid P]
+=\sum_ DK_ {D,P}(c_ D).
+\tag{21c}
+\end{equation}
+The second equality uses only the finite sum and independence of the
+fine blocks.  In general $K_ {D,P}$ depends on the whole restriction
+$P|_ D$, so it cannot be replaced by a function of $\fint_ DP$.
+If $P=p_ D$ is constant on $D$, however, integration by parts gives
+the exact specialization
+\begin{equation}
+K_ {D,P}(c_ D)=K_ {h,L,\Psi}(c_ D)+p_ D\cdot m_ D(c).
+\tag{21d}
+\end{equation}
+In particular (21d) proves the fixed-trace identity used in (17), and
+it also applies conditionally when the constants $p_ D$ are random but
+measurable with respect to the independent coarse sigma-field.
+
+\smallskip\noindent
+\underline{\textit{Step 4.}} Control optimization over the finite trace family.
+
+For a fixed skeleton trace, the optimized fine value in one $L$-cell
+is $CL$-Lipschitz in its standard Gaussian coefficients.  Indeed, in
+each unit outer block subtract the average of $F$; balance makes this
+subtraction invisible, and the unit-block Poincare inequality gives
+\begin{equation}
+\sum_ {C\text{ fine}}
+\left(n\int_ C(F-\fint_ {Q_ 1}F)\right)^2
+\leq C\int_ {Q_ 1}|\nabla F|^2\leq C.
+\tag{21b}
+\end{equation}
+Summing (21b) over the $L^2$ outer blocks gives Gaussian Lipschitz
+radius $CL$.  Values in different $L$-cells depend on disjoint
+Gaussian blocks.  Hence a fixed \emph{global} trace value has subgaussian
+radius at most $C\sqrt{|\Omega|}$, independently of the realized
+coarse field $P$.  The elementary
+Gaussian estimate
+\begin{equation*}
+\mathbb E\max_ {\alpha\leq m}(Y_ \alpha-\mathbb EY_ \alpha)
+\leq \sigma\sqrt{2\log m}
+\end{equation*}
+for $\sigma$-subgaussian variables, combined with (21), gives,
+pointwise in $P$,
+\begin{equation}
+\mathbb E_ \eta\max_ {c\in\mathcal N}\mathcal V_ c(P,\eta)
+\leq\max_ {c\in\mathcal N}\sum_ DK_ {D,P}(c_ D)
++C|\Omega|\sqrt{\frac{\log(C/\varepsilon)}L}.
+\tag{21e}
+\end{equation}
+Specialize to $P\equiv p$, use (21d), and combine (21a') with (21e) to prove
+(17).  Formula (17c) follows by restricting the original supremum to
+any fixed common trace.  For random cellwise constants, (21d)--(21e) remain valid conditionally
+on the coarse sigma-field.  We will take expectation in that field after
+the deterministic comparison in the next section.
+
+\smallskip\noindent
+\underline{\textit{Step 5.}} Identify the deterministic one-cell operator.
+
+If $c_ 1,c_ 2$ are two traces, convex combinations of their admissible
+interiors are admissible, and the integrand in (20) is concave in
+$\nabla F$. Hence $K$ is concave. On an $m\times m$ torus of
+$L$-cells, average any deterministic trace pattern over all cell
+translations on the universal cover, subtracting each translated value
+at the origin before averaging.  Opposite sides telescope, so the two
+global cocycle increments are preserved.  The averaged trace is
+one-cell affine-periodic, and cellwise concavity gives
+\begin{equation*}
+m^{-2}\sum_ zK(c_ z)\leq K\!\left(m^{-2}\sum_ zc_ z\right).
+\end{equation*}
+Conversely such a trace repeats globally. This proves (18)--(19) on a
+torus; the explicit finite-square affine-periodicity correction used later is
+proved in Lemma~\ref{lem:two-scale-scalarization}.  Equations (15)--(16) say
+exactly that $H=\mathcal H_ {h,L}\Psi$.  This identifies the deterministic
+cell functional in (18)--(19).
+
+\end{proof}
+
+\section{A quantitative two-scale comparison}\label{sec:two-scale}
+
+We now remove one fine band $\eta$ from the transport problem by
+replacing $\Psi$ with $\mathcal H_{h,L}\Psi$.  The remaining source is
+the independent coarse field $\zeta$.  The previous section treats a
+constant base flux, so we first need room to smooth the coarse problem,
+freeze it on blocks, and join the resulting cell competitors.
+With the outer blocks of the fine band normalized to side one, the
+scales satisfy
+\[
+1\ll L\ll B\ll A\ll S\leq R:
+\]
+Here $L$ is the cell side used by $\mathcal H_{h,L}$, and $B$ is the
+side of a block on which the smoothed flux or slope is approximated by a
+constant.  Smoothing on the larger scale $A$ makes this approximation
+accurate, while $A\ll S$ keeps its effect on the coarse source small.
+The ambient square has side $R$.
+
+\begin{lemma}[Two-scale comparison]\label{lem:two-scale-scalarization}
+Let $\eta$ be one retained $h$-level dyadic band, normalized so that
+its outer blocks have side one. Let $\zeta$ be an independent sum of
+at most $T$ coarser Haar levels whose smallest parent side, in this
+normalization, is the dyadic integer $S$.  Work on $Q_ R$, where
+$R$ is a common multiple of $L,B,A,S$, and all dyadic parents are
+aligned with its boundary.  For brevity write $Q:=Q_R$ throughout this
+lemma.  Let $P$ be the sum of the scaled linear
+right inverses (12a), so that
+$-\operatorname {div}P=\zeta$ and $P\cdot n=0$. It satisfies
+\begin{equation}
+\sup_ {x\in Q_ R}\mathbb E|P(x)|\leq C\sqrt T,\qquad
+\mathbb E\fint_ {\mathbb T_ {2R}^2}
+|P^{\rm ref}(x+z)-P^{\rm ref}(x)|\,dx\leq C|z|/S,
+\tag{22}
+\end{equation}
+for $|z|\leq A\ll S$, where $P^{\rm ref}$ is the covariant
+reflection defined in (22b0) below.  The same estimate, without
+reflection, holds on every aligned interior translate.
+For $1\ll L\ll B\ll A\ll S$, $0<\varepsilon<1/10$, and a
+$D_ 4$-invariant $\Psi\in\mathscr P_ M$, put
+\begin{equation}
+\delta=\varepsilon+\frac1{\varepsilon L}
++\frac{L}{\varepsilon B}+\frac{B}{\varepsilon A}+\frac AS.
+\tag{23}
+\end{equation}
+Assume also
+\begin{equation}
+\varepsilon L\geq C,\qquad L+B^2/A\leq c\varepsilon B.
+\tag{23a}
+\end{equation}
+Both inequalities hold for the schedule used below.
+On this aligned square,
+\begin{equation}
+\begin{split}
+\frac1{|Q|}\bigl|\mathbb EJ_ \Psi^Q(\eta+\zeta)
+-\mathbb EJ_ {\mathcal H_ {h,L}\Psi}^Q(\zeta)\bigr|
+\leq {}&C\delta\left(
+1+\frac{\mathbb EJ_ {\mathcal H_ {h,L}\Psi}^Q(\zeta)}{|Q|}
++M+\sqrt T+\sqrt h\right)\\
+&+C\sqrt{\frac{\log(C/\varepsilon)}L}.                            
+\end{split}
+\tag{24}
+\label{eq:two-scale-scalarization}
+\end{equation}
+The estimate is uniform for every iterated profile occurring below; in
+particular, there is no uncontrolled error from an infinite-volume limit.
+
+\end{lemma}
+
+\begin{proof}
+Write $H=\mathcal H_{h,L}\Psi$.  For the upper bound, we start with a
+flux for $J_H^Q(\zeta)$ and add fine-source corrections with zero normal
+trace on $B$-blocks.  The local estimate (26) will compare their cost
+with $H$ at the frozen flux.  For the lower bound, we start with a dual
+potential for $J_H^Q(\zeta)$ and insert fine cell optimizers while
+preserving common values on the $B$-block boundaries.
+
+Both constructions require smoothing near the outer boundary.  We first
+prove the coarse translation estimate and a reflection argument that
+preserves zero normal trace, including for measure-valued fluxes.  The
+terms in $\delta$ then arise from contraction, $L$-cell corridors,
+affine-periodicity correction, $B$-block seams, and coarse translation,
+in that order.  The separate square-root term in (24) is the Gaussian
+concentration error from Lemma~\ref{lem:finite-trace-net}.
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Control translations of the coarse flux.
+
+We use the following explicit right inverse in (22).
+On a Haar parent $[0,r]^2$, for a mean-zero density $f$, set
+\begin{equation}
+\begin{aligned}
+m(y)&=r^{-1}\int_0^r f(s,y)\,ds,\\
+P_1(x,y)&=-\int_0^x(f(s,y)-m(y))\,ds,\\
+P_2(x,y)&=-\int_0^y m(t)\,dt.
+\end{aligned}
+\tag{22a0}
+\end{equation}
+Then $-\operatorname {div}P=f$ and $P\cdot n=0$ on all four
+faces.  For a normalized Haar detail on a parent of side $r$, every
+pointwise Gaussian coefficient in (22a0) is $O(1)$, while the expected
+total variation of $DP$ per unit area is $O(r^{-1})$.
+Consequently
+\begin{equation}
+\mathbb E\fint|P_ j(\cdot+z)-P_ j|
+\leq C\min\{1,|z|/r_ j\}.
+\tag{22a}
+\end{equation}
+The fields $P_ j$ are independent and centred, so their pointwise
+second moments add, giving the first estimate in (22).  Since the
+scales $r_ j\geq S$ grow geometrically, summing (22a) gives the second.
+The explicit normal component vanishes on every aligned parent face;
+covariant reflection therefore creates no jump there, and the same
+BV translation estimate holds on the reflected torus.
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Smooth without changing the boundary constraint.
+
+An effective minimizing flux may have a singular part.  We therefore
+smooth in the space of vector measures and preserve the divergence and
+normal-trace constraints before estimating the energy.  A vector
+Radon measure $\mu\in\mathcal M(\overline Q_ R;\mathbb R^2)$ has
+source $\rho$ and zero outer normal trace precisely when
+\begin{equation}
+\int_ {\overline Q_ R}\nabla\phi\cdot d\mu
+=\langle\rho,\phi\rangle
+\quad\text{for every }\phi\in C^1(\overline Q_ R).
+\tag{22b0}
+\end{equation}
+In particular, if $w=P\mathcal L^2+v$ and $P\mathcal L^2$ have
+the same source and zero normal trace, then $v$ is divergence-free
+and the left side of (22b0) is zero.
+
+Identify $\mathbb T_ {2R}^2$ with $[-R,R)^2$.  For
+$\epsilon=(\epsilon_ 1,\epsilon_ 2)\in\{\pm1\}^2$, set
+$S_ \epsilon x=(\epsilon_ 1x_ 1,\epsilon_ 2x_ 2)$ and
+$O_ \epsilon=\operatorname {diag}(\epsilon_ 1,\epsilon_ 2)$.  Define
+the covariant reflection, including any boundary-supported tangential
+part, by
+\begin{equation}
+\int_ {\mathbb T_ {2R}^2}\Phi(y)\cdot dv^{\rm ref}(y)
+=\sum_ {\epsilon\in\{\pm1\}^2}\int_ {\overline Q_ R}
+\Phi(S_ \epsilon x)\cdot O_ \epsilon\,dv(x).
+\tag{22b1}
+\end{equation}
+For every smooth periodic scalar $\chi$, the chain rule and (22b0)
+give
+\begin{equation}
+\int_ {\mathbb T_ {2R}^2}\nabla\chi\cdot dv^{\rm ref}
+=\sum_ \epsilon\int_ {\overline Q_ R}
+\nabla(\chi\circ S_ \epsilon)\cdot dv=0.
+\tag{22b2}
+\end{equation}
+Thus the reflected measure remains divergence-free across the faces,
+periodic seams, and corners.  For a density $P$, define
+$P^{\rm ref}(S_ \epsilon x)=O_ \epsilon P(x)$.  The same calculation
+reflects its scalar source evenly.  Thus
+$(P\mathcal L^2+v)^{\rm ref}=P^{\rm ref}\mathcal L^2+v^{\rm ref}$.
+
+Let $\varphi_ A$ be a nonnegative smooth radial probability kernel on
+the torus, supported at scale $A<R/4$, and put
+\begin{equation}
+v_ A=(\varphi_ A*v^{\rm ref})|_ {Q_ R},\qquad
+P_ A=(\varphi_ A*P^{\rm ref})|_ {Q_ R}.
+\tag{22b3}
+\end{equation}
+Convolution preserves (22b2), and covariance under the reflections
+forces the classical normal component of $v_ A$ to vanish on every
+side.  Hence $v_ A$ is an exact smooth divergence-free zero-normal
+field on $Q_ R$, and
+\begin{equation}
+\int_ {Q_ R}|Dv_ A|\leq CA^{-1}|v|(\overline Q_ R).
+\tag{22b4}
+\end{equation}
+
+To control the energy of this smoothing, let $H$ be any convex profile with
+$|z|\leq H(z)\leq|z|+M_ H$.  Its recession function is $|z|$, and
+for $\mu=\mu^a\mathcal L^2+\mu^s$ define
+\begin{equation*}
+\mathcal F_ H(\mu;U)=\int_ UH(\mu^a)\,dx+|\mu^s|(\overline U).
+\end{equation*}
+The perspective
+\begin{equation*}
+\widehat H(t,z)=
+\begin{cases}tH(z/t),&t>0,\\ |z|,&t=0,
+\end{cases}
+\end{equation*}
+is convex, lower semicontinuous, and positively one-homogeneous.  If
+$\lambda$ dominates $\mathcal L^2$ and $\mu$, and
+$(a,b)=d(\mathcal L^2,\mu)/d\lambda$, then
+\begin{equation}
+\mathcal F_ H(\mu)=\int\widehat H(a,b)\,d\lambda.
+\tag{22b5}
+\end{equation}
+Applying convexity pointwise to the convolution of the pair
+$(\mathcal L^2,\mu)$, followed by Fubini, proves the measure-level
+Jensen inequality
+\begin{equation}
+\mathcal F_ H(\varphi_ A*\mu;\mathbb T_ {2R}^2)
+\leq\mathcal F_ H(\mu;\mathbb T_ {2R}^2).
+\tag{22b6}
+\end{equation}
+This argument includes singular measures and does not presuppose an
+$L^1$ minimizer.
+
+Assume now that $H$ is invariant under the signed coordinate
+reflections, as is every profile in the iteration.  The reflected
+measure has energy at most four times the original energy (overlapping
+face masses use the triangle inequality for the recession norm), while
+the convolved density has four equal quadrant energies.  From (22b6),
+\begin{equation}
+\int_ {Q_ R}H(P_ A+v_ A)\,dx
+\leq\mathcal F_ H(P\mathcal L^2+v;Q_ R).
+\tag{22b7}
+\end{equation}
+Moreover (22) and Fubini give
+\begin{equation}
+\mathbb E\int_ {Q_ R}|P_ A-P|\leq C(A/S)|Q_ R|.
+\tag{22b8}
+\end{equation}
+Since $H$ is $1$-Lipschitz, (22b7)--(22b8) yield
+\begin{equation}
+\mathbb E\int_ {Q_ R}H(P+v_ A)
+\leq\mathbb E\mathcal F_ H(P\mathcal L^2+v;Q_ R)
++C(A/S)|Q_ R|.
+\tag{22b9}
+\end{equation}
+Consequently, we may smooth the divergence-free correction on the
+whole square at expected cost $CA/S$ per unit area.
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Upper bound: smooth and freeze the flux.
+
+For the upper bound in \eqref{eq:two-scale-scalarization}, use the relaxed linear-growth functional on
+vector Radon measures and take a near-minimizer
+$w=P\mathcal L^2+v$ for
+$J_ {\mathcal H_ {h,L}\Psi}^Q(\zeta)$, where
+$\operatorname {div}v=0$ and $v$ has zero outer normal trace.
+(The singular part is charged by the recession
+function $|\cdot|$.) Convolve only $v$ on scale $A$.  Equations
+(22b7)--(22b9) change the effective energy by at most $CA/S$ per unit
+area.  Coercivity
+$\mathcal H_ {h,L}\Psi\geq|\cdot|$ controls the total variation of $v$.
+Let $p_ D=\fint_ D(P+v_ A)$ on each interior $B$-block.  Poincare's
+inequality, (22), and (22b4) give
+\begin{equation}
+R^{-2}\mathbb E\sum_ D\int_ D|P+v_ A-p_ D|
+\leq C\left(\frac BA+\frac BS\right)
+\left(1+R^{-2}\mathbb E|v|(Q_ R)+\sqrt T\right).
+\tag{25}
+\end{equation}
+
+The remaining local task is to insert the fine source at constant base
+$p_D$.  We next prove a deterministic comparison uniform in this base,
+so that it can subsequently be applied conditionally to the coarse field.
+
+\smallskip\noindent
+\underline{\textit{Step 4.}} Upper bound: compare the finite-block cost.
+
+We seek the two inequalities in (26) between the expected cost of a
+zero-normal fine correction on a $B$-box and $H(p)$.  Repeating an
+optimal affine-periodic $L$-cell trace gives the lower inequality.  For
+the upper inequality, the finite-trace lemma first makes the trace
+deterministic.  Averaging that trace over cell translations leaves small
+errors in its opposite-face increments; correcting those errors will
+produce an admissible trace for $H$.
+
+The fine source is exactly balanced on every $B$-block.  To formulate
+the local problem without suppressing singular parts, for $p\in
+\mathbb R^2$ set
+\begin{equation}
+\begin{split}
+I_ B(p,\eta_ D)&=\min\{\mathcal F_ \Psi(p\mathcal L^2+u;D):
+-\operatorname {div}u=\eta_ D, [u\cdot n]_ {\partial D}=0\},\\
+N_ B(p)&=B^{-2}\mathbb E_ \eta I_ B(p,\eta_ D).                    
+\end{split}
+\tag{25a0}
+\end{equation}
+Here the constraint is on the correction $u$, not on the constant
+base $p\mathcal L^2$.  Apply the same separation argument as in (2)
+to this affine constraint.  Fenchel's inequality reads
+$\Psi(p+u)\geq\nabla F\cdot(p+u)-\Psi^*(\nabla F)$, while the
+zero-normal constraint gives
+$\int_ D\nabla F\cdot du=\langle\eta_ D,F\rangle$.  Separation gives
+the reverse inequality and hence, realization by realization,
+\begin{equation}
+I_ B(p,\eta_ D)=\max_ {F\in\mathscr A_ B}
+\left\{\langle\eta_ D,F\rangle+
+\int_ Dp\cdot\nabla F-\int_ D\Psi^*(\nabla F)\right\}.
+\tag{25a1}
+\end{equation}
+
+We first prove the lower side of the finite comparison.  Fix
+$|a|\leq1$ and a trace $c\in\mathcal T_ L^{\rm per}(a)$ attaining
+$\mathcal R(a)$.  Repeat its universal-cover affine-periodic lift through the $B$-box
+and, for each fine realization, fill every $L$-cell by an optimizer
+with that complete trace.  The interiors paste, and every cell has mean
+gradient $a$.  Substitution in (25a1), expectation, and maximization
+over $a$ give
+\begin{equation}
+(\mathcal H_ {h,L}\Psi)(p)\leq N_ B(p).
+\tag{25a2}
+\end{equation}
+
+For the reverse side apply (21a')--(21e) to (25a1) with the constant
+realized field $P\equiv p$.  Since (21d) applies exactly,
+\begin{align}
+N_ B(p)&\leq \mathfrak A_ {B,L}(p)
++C(M+\sqrt h+|p|)
+\left(\varepsilon+\frac1{\varepsilon L}\right)
++C\sqrt{\frac{\log(C/\varepsilon)}L},                         \tag{25a3}\\
+\mathfrak A_ {B,L}(p)&=B^{-2}\max_ {c\in\mathfrak T_ {B,L}}
+\sum_ z\{K(c_ z)+p\cdot m_ L(c_ z)\}.                       \tag{25a4}
+\end{align}
+Every constant is uniform in the possibly unbounded vector $p$.
+
+Choose a maximizing trace in (25a4), one global extension $F$, and
+write $n=B/L$,
+\begin{equation}
+g(s)=n^{-2}\sum_ {z\in\{0,\ldots,n-1\}^2}F(Lz+s),\quad s\in Q_ L,
+\qquad q=B^{-2}\int_ {Q_ B}\nabla F.
+\tag{25a5}
+\end{equation}
+Additive constants do not affect $K$, so concavity and the divergence
+theorem give
+\begin{equation}
+n^{-2}\sum_ zK(c_ z)\leq K(g|_ {\partial Q_ L}),\qquad
+B^{-2}\sum_ zp\cdot m_ L(c_ z)=p\cdot q.
+\tag{25a6}
+\end{equation}
+For $s$ on the face $s_ j=0$, let
+$D_ j(s)=g(s+Le_ j)-g(s)$.  Telescoping in direction $e_ j$ leaves
+only the two outer rows of the $B$-box.  The resulting function is
+$2/n$-Lipschitz and its face average is $Lq_ j$; hence
+\begin{equation}
+\|D_ j-Lq_ j\|_ \infty\leq2L/n.
+\tag{25a7}
+\end{equation}
+
+The averaged function $g$ is already Lipschitz, but (25a7) gives only
+approximate affine-periodicity.  We repeat $g$ with the desired affine
+increments and then remove the resulting small seam jumps by a Lipschitz
+envelope.  Put
+$\theta=1-4\varepsilon$, $d=2L/n$, and, on half-open cells of the
+universal cover, define
+\begin{equation*}
+G_ 0(s+Lk)=\theta g(s)+\theta Lq\cdot k.
+\end{equation*}
+Its seam jumps are at most $d$.  A segment of Euclidean length $r$
+crosses at most $2+\sqrt2r/L$ grid faces: the sum of its two coordinate
+displacements is at most $\sqrt2r$.  Since
+$\sqrt2d/L=2\sqrt2/n\leq\varepsilon$ when $n\varepsilon\geq8$, we obtain
+\begin{equation}
+|G_ 0(x)-G_ 0(y)|\leq(1-3\varepsilon)|x-y|+4d.
+\tag{25a8}
+\end{equation}
+Since $|\theta q|\leq\theta<1-\varepsilon/2$, the following
+infimum is finite.  Define
+\begin{equation*}
+\widehat G(x)=\inf_ y\{G_ 0(y)+(1-\varepsilon/2)|x-y|\}.
+\end{equation*}
+The change of variable $y\mapsto y+Lk$ proves the exact cocycle
+$\widehat G(x+Lk)=\widehat G(x)+\theta Lq\cdot k$, while (25a8)
+gives $G_ 0-4d\leq\widehat G\leq G_ 0$.  Thus
+$\widehat c=\widehat G|_ {\partial Q_ L}$ is an admissible
+affine-periodic trace of slope $\theta q$ and differs from
+$\theta g$ by at most $4d$.
+
+For a fine realization take an optimizer with trace $g$, keep its
+$\theta$-multiple on every unit outer block farther than
+$C(1+d/\varepsilon)$ from $\partial Q_ L$, prescribe
+$\widehat c$ on the boundary, and use McShane extension in the collar.
+The same realized flux calculation as (21a') and
+$-\Psi^*(\theta a)\geq-\theta\Psi^*(a)
+-(1-\theta)\Psi^*(0)$ give
+\begin{equation}
+L^{-2}K(g)\leq \mathcal R(\theta q)+C(M+\sqrt h)
+\left(\varepsilon+\frac1{\varepsilon L}
++\frac L{\varepsilon B}\right).
+\tag{25b}
+\end{equation}
+Since $p\cdot q\leq p\cdot(\theta q)+4\varepsilon|p|$, equations
+(25a3)--(25b) and the definition of $\mathcal H$ prove the complete
+finite-block zero-normal comparison
+\begin{equation}
+\boxed{\begin{aligned}
+(\mathcal H_ {h,L}\Psi)(p)\leq N_ B(p)
+\leq{}&(\mathcal H_ {h,L}\Psi)(p)\\
+&+C(M+\sqrt h+|p|)
+\left(\varepsilon+\frac1{\varepsilon L}
++\frac L{\varepsilon B}\right)
++C\sqrt{\frac{\log(C/\varepsilon)}L}.
+\end{aligned}}
+\tag{26}
+\end{equation}
+
+Estimate (26) is uniform in the possibly unbounded base vector $p$,
+so it applies conditionally to the random block averages $p_D$.
+
+\smallskip\noindent
+\underline{\textit{Step 5.}} Upper bound: paste the local flux corrections.
+
+Now condition on the coarse sigma-field.  Each
+$p_ D=\fint_ D(P+v_ A)$ is then deterministic and independent of the
+fine field, and the local sources are independent.  Using the same
+correction $u$ at two bases changes its normalized energy by at most
+$|p-p'|$, so $N_ B$ is $1$-Lipschitz and hence Borel.  Equations
+(25a0) and (26) give the exact
+conditional calculation
+\begin{equation}
+\begin{split}
+\mathbb E_ \eta\!\left[\sum_ DI_ B(p_ D,\eta_ D)\mid\mathscr G\right]
+={}&\sum_ D|D|N_ B(p_ D)\\
+\leq{}&\sum_ D|D|H(p_ D)
++C\alpha\left\{(M+\sqrt h)|Q|+\sum_ D|D||p_ D|\right\}\\
+&+C|Q|\sqrt{\frac{\log(C/\varepsilon)}L},\qquad
+\alpha=\varepsilon+\frac1{\varepsilon L}
++\frac L{\varepsilon B},               
+\end{split}
+\tag{26i}
+\end{equation}
+where $H=\mathcal H_ {h,L}\Psi$.  We now use this conditional bound to construct a global flux and then
+average over the coarse field.
+
+Fix $\tau_{\rm sel}>0$ and choose measurable
+$\tau_{\rm sel}|D|$-minimizers $u_ D^{\tau_{\rm sel}}$ in (25a0)
+as justified at the end of the proof.  The zero extensions have no interface divergence.  Add them to the
+unfrozen smoothed flux to obtain the global competitor
+\begin{equation*}
+\mu^{\tau_{\rm sel}}=(P+v_ A)\mathcal L^2+\sum_ Du_ D^{\tau_{\rm sel}},
+\end{equation*}
+which has source $\eta+\zeta$ and zero outer normal trace.  The constants
+$p_D$ enter only the energy comparison below.  The $1$-Lipschitz property of $\Psi$ and
+subadditivity of its recession norm give
+\begin{equation}
+\mathcal F_ \Psi(\mu^{\tau_{\rm sel}};Q)
+\leq\sum_ D\mathcal F_ \Psi(p_ D\mathcal L^2+u_ D^{\tau_{\rm sel}};D)
++\sum_ D\int_ D|P+v_ A-p_ D|.
+\tag{26j}
+\end{equation}
+This remains true if local corrections have tangential mass on a common
+face.  Take conditional expectation, use (26i), Jensen
+$\sum_ D|D|H(p_ D)\leq\int_ QH(P+v_ A)$, and
+$\sum_ D|D||p_ D|\leq\int_ QH(P+v_ A)$.  Equations (22b9) and (25),
+followed by $\tau_{\rm sel}\downarrow0$, prove the upper inequality in
+\eqref{eq:two-scale-scalarization}.
+Thus
+$\mathbb EJ_ \Psi(\eta+\zeta)\leq\mathbb EJ_ H(\zeta)+\text{error}$,
+with no additional interface cost from the local corrections.
+
+\smallskip\noindent
+\underline{\textit{Step 6.}} Lower bound: smooth the potential and freeze its slopes.
+
+For the lower bound in \eqref{eq:two-scale-scalarization}, fix
+$\tau_{\rm sel}>0$, use (2) for
+$J_ {\mathcal H_ {h,L}\Psi}^Q(\zeta)$, and take a
+$\tau_{\rm sel}|Q|$-maximizing global potential $F$, normalized at one point.
+Extend it by successive even
+reflections across the square sides and then $2R$-periodically, and
+convolve at scale $A$.  Even reflection and convolution preserve the
+unit Lipschitz bound: explicitly, the coordinate-folding map from the
+torus to $Q_ R$ is $1$-Lipschitz.  If
+$F_ A=\varphi_ A*F^{\rm ref}$, then
+$\|D^2F_ A\|_ \infty\leq C/A$.  Reflecting $P$ covariantly as in
+(22b1), Fubini gives the exact identity
+\begin{equation*}
+\int_ {\mathbb T_ {2R}^2}P^{\rm ref}\cdot\nabla F_ A
+=\int_ {\mathbb T_ {2R}^2}P_ A\cdot\nabla F^{\rm ref}.
+\end{equation*}
+For $\mathcal R=-H^*$, concavity and reflection invariance give
+$\mathcal R(\nabla F_ A)\geq\varphi_ A*\mathcal R(\nabla F^{\rm ref})$.  Divide the
+resulting torus inequality by four and use (22b8).  The value decreases
+by at most $CA|Q|/S$, and no outer collar is discarded.
+
+Write $H=\mathcal H_ {h,L}\Psi$, $\mathcal R=-H^*$, and
+$M_ h=M+C\sqrt h$.  Concavity of $\mathcal R$, even reflection, and (22) give
+for the smoothed potential
+\begin{equation}
+\mathbb E\int_ Q\{P\cdot\nabla F_ A+\mathcal R(\nabla F_ A)\}
+\geq\mathbb EJ_ H^Q(\zeta)-C(A/S+\tau_{\rm sel})|Q|,
+\tag{26a}
+\end{equation}
+where $\tau_{\rm sel}|Q|$ is the initial near-maximization error.  Also
+$\|D^2F_ A\|_ \infty\leq C/A$.
+
+For every $B$-block $D$, put
+\begin{equation*}
+a_ D=\fint_ D\nabla F_ A.
+\end{equation*}
+Then $|a_ D|\leq1$, and Jensen's inequality for the concave function
+$\mathcal R$ gives
+\begin{equation}
+|D|\mathcal R(a_ D)\geq\int_ D \mathcal R(\nabla F_ A).
+\tag{26b}
+\end{equation}
+Choose measurably a trace $c_ D\in\mathcal T_ L^{\rm per}(a_ D)$
+attaining $\mathcal R(a_ D)$, and repeat one of its cell extensions as
+$a_ D\cdot x+u_ D(x)$.  The periodic part may be normalized so that
+$\|u_ D\|_ \infty\leq CL$.  Let $\ell_ D$ be affine with gradient
+$a_ D$ and the value of $F_ A$ at the centre of $D$, and put
+$f_ D=\ell_ D+u_ D$, with phase aligned to the global $L$-grid.
+Since $\|D^2F_ A\|_ \infty\leq C/A$,
+\begin{equation}
+\|F_ A-f_ D\|_ {L^\infty(D)}\leq C(L+B^2/A).
+\tag{26c}
+\end{equation}
+
+Estimate (26c) controls the error in values, which is what we need to
+join the block potentials while keeping the Lipschitz constraint.
+
+\smallskip\noindent
+\underline{\textit{Step 7.}} Lower bound: join the fine potentials.
+
+The potentials $f_D$ may disagree on adjacent block boundaries.
+We prescribe the common value $\theta F_A$ there and interpolate to
+$\theta f_D$ inside each block.  The contraction provides the slack
+needed for the interpolation gradient; away from these seams, the
+affine-periodic traces remain available for fine optimization.
+
+Set $\theta=1-4\varepsilon$ and
+\begin{equation*}
+w=C(L+B^2/A)/\varepsilon<B/4
+\end{equation*}
+by (23a).  Choose a cutoff $\chi_ D$ which is zero on $\partial D$,
+one outside the width-$w$ seam, and satisfies
+$|\nabla\chi_ D|\leq C/w$.  Define
+\begin{equation}
+G_ D=\theta\{(1-\chi_ D)F_ A+\chi_ D f_ D\}.
+\tag{26d}
+\end{equation}
+The first part of its gradient is $\theta$ times a convex combination
+of two vectors in $\overline B_ 1$, while (26c) makes the cutoff term
+at most $\varepsilon$.  Hence $|\nabla G_ D|\leq1-3\varepsilon$.
+Because $G_ D=\theta F_ A$ on every $\partial D$, the $G_ D$'s paste
+into one global Lipschitz skeleton.  The proportion of $L$-cells
+meeting a transition seam is at most
+\begin{equation}
+C\left(\frac{L}{\varepsilon B}
++\frac{B}{\varepsilon A}\right).
+\tag{26e}
+\end{equation}
+
+In a non-seam $L$-cell the trace is, up to an additive constant, a
+translate of $\theta c_ D$.  Concavity of $K$, together with
+$K(0)\geq0$ from (16d), gives
+\begin{equation}
+K(\theta c_ D)\geq\theta K(c_ D)=\theta L^2\mathcal R(a_ D).
+\tag{26f}
+\end{equation}
+Let $t_ C=G_ D|_ {\partial C}$ be the trace on each $L$-cell and,
+conditionally on the coarse sigma-field, fill it by a measurable
+realization-wise optimizer for the independent fine Gaussian vector in
+that cell.  Complete traces make the interiors paste exactly to a global
+potential $\widetilde F$.  The fixed-trace identity (21c) now gives,
+without interchanging a random maximum and expectation,
+\begin{equation}
+\mathbb E_ \eta\!\left[
+\langle\eta,\widetilde F\rangle-
+\int_ Q\Psi^*(\nabla\widetilde F)\,\middle|\,\mathscr G\right]
+=\sum_ CK(t_ C).
+\tag{26g}
+\end{equation}
+In a seam cell $K(t_ C)\geq0$: use the deterministic trace extension,
+then average the centred source, and use $-\Psi^*\geq0$.  Therefore
+(26b), (26e), and (26f), with $0\leq \mathcal R\leq M_ h$, imply
+\begin{equation}
+\sum_ CK(t_ C)\geq\theta\int_ Q\mathcal R(\nabla F_ A)
+-CM_ h|Q|\left(\varepsilon+\frac{L}{\varepsilon B}
++\frac{B}{\varepsilon A}\right).
+\tag{26h}
+\end{equation}
+
+It remains to control the coarse-source pairing after replacing the
+interiors.  Put $P_ D=\fint_ DP$.  The potentials
+$\widetilde F$ and $\theta F_ A$ have identical traces on
+$\partial D$, and hence
+\begin{equation}
+\int_ DP_ D\cdot\nabla(\widetilde F-\theta F_ A)=0,
+\qquad
+\int_ DP\cdot\nabla\widetilde F
+\geq\theta\int_ DP\cdot\nabla F_ A-2\int_ D|P-P_ D|.
+\tag{26k}
+\end{equation}
+Averaging (22) over pairs in each $B$-block gives
+\begin{equation}
+\mathbb E\sum_ D\int_ D|P-P_ D|\leq C(B/S)|Q|.
+\tag{26l}
+\end{equation}
+Finally, replacing the effective value by its factor $\theta$ costs
+at most $C\varepsilon(M_ h+\sqrt T)|Q|$, because
+$0\leq \mathcal R\leq M_ h$ and $\sup_ x\mathbb E|P(x)|\leq C\sqrt T$.
+Combine (26a), (26g)--(26l), and let $\tau_{\rm sel}\downarrow0$.  This proves
+the lower inequality in \eqref{eq:two-scale-scalarization} with exactly the terms in (23), and establishes
+the direction
+$\mathbb EJ_ \Psi(\eta+\zeta)\geq\mathbb EJ_ H(\zeta)-\text{error}$.
+
+The constructions above use choices depending on the coarse field or
+on individual fine-source realizations.  We finish by verifying the
+measurability needed for their conditional expectations.
+
+\smallskip\noindent
+\underline{\textit{Step 8.}} Measurable selections.
+
+We use the following selection principle.  If $S$ is standard Borel, $X$ is a
+countable union of compact metrizable sets, $\Gamma\subset S\times X$
+is Borel with nonempty closed sections in the relevant compact sets, and
+$f$ is jointly Borel, lower semicontinuous in $x$, and has compact
+parameterwise sublevels, then the infimum is universally measurable and
+there is a universally measurable $\tau_{\rm sel}$-minimizer for every
+$\tau_{\rm sel}>0$.  Apply this to $-f$ for upper semicontinuous maxima.
+Indeed, intersect rational sublevel sets with the compact exhaustion and
+select successively the first member of a countable finite-ball cover
+whose section is nonempty; the nested balls give the selector.  On our
+completed Gaussian spaces universal measurability is sufficient.
+
+For a closed block $D$, take
+$X_ D=\mathcal M(\overline D;\mathbb R^2)$ with its weak-* Borel
+structure.  Since $C(\overline D;\mathbb R^2)$ is separable, every
+total-variation ball is compact metrizable, and these balls exhaust
+$X_ D$.  Choose a countable $C^1$-dense family $\{\phi_ k\}$.  If
+the finite Gaussian vector $g$ parametrizes $\eta_ D(g)$, the graph
+\begin{equation}
+\Gamma_ D=\left\{(g,u):
+\int_ {\overline D}\nabla\phi_ k\cdot du
+=\langle\eta_ D(g),\phi_ k\rangle\quad\text{for every }k\right\}
+\tag{26m}
+\end{equation}
+is closed and is exactly the divergence plus zero-normal constraint by
+density.  The function
+\begin{equation}
+(p,g,u)\longmapsto\mathcal F_ \Psi(p\mathcal L^2+u;D)
+\tag{26n}
+\end{equation}
+is jointly Borel and weak-* lower semicontinuous by the perspective
+formula (22b5).  Its sublevels are compact because
+\begin{equation}
+|u|(\overline D)\leq
+\mathcal F_ \Psi(p\mathcal L^2+u;D)+|p||D|.
+\tag{26o}
+\end{equation}
+The explicit zero-normal Haar right inverse makes every constraint
+section nonempty.  The principle therefore supplies a jointly
+universally measurable $u_ D^{\tau_{\rm sel}}(p,g)$ satisfying the constraints
+and
+\begin{equation}
+\mathcal F_ \Psi(p\mathcal L^2+u_ D^{\tau_{\rm sel}};D)
+\leq I_ B(p,\eta_ D(g))+\tau_{\rm sel}|D|.
+\tag{26p}
+\end{equation}
+This proves the measurability asserted in (26j), including composition
+with an unbounded coarse-measurable $p_ D$.
+
+For the effective primal problem use the same measure space on $Q$,
+the closed subspace
+\begin{equation*}
+\mathscr V_ Q=\left\{v:\int_ {\overline Q}\nabla\phi_ k\cdot dv=0
+\text{ for every }k\right\},
+\end{equation*}
+and parameter space $L^1(Q;\mathbb R^2)$ for $P$.  The map
+$(P,v)\mapsto\mathcal F_ H(P\mathcal L^2+v;Q)$ is jointly Borel,
+weak-* lower semicontinuous in $v$, and coercive exactly as in
+(26n)--(26o).  We obtain a universally measurable
+$\tau_{\rm sel}|Q|$-minimizer $v^{\tau_{\rm sel}}(P)$.  Reflection, convolution,
+block averaging, and finite sums are Borel operations, so the entire
+competitor for the upper bound is measurable.
+
+For dual selections, the spaces
+\begin{equation*}
+\mathscr A_ L=\{F\in C(\overline Q_ L):F(0)=0,
+\operatorname {Lip}(F)\leq1\},
+\qquad \mathcal T_ L=\{F|_ {\partial Q_ L}:F\in\mathscr A_ L\}
+\end{equation*}
+are compact Polish in the uniform norm, and the fixed-trace graph
+$\{(c,F):F|_ {\partial Q_ L}=c\}$ is closed.  Uniform convergence in
+$\mathscr A_ L$ implies weak-* convergence of gradients.  Hence, for
+the cell Gaussian vector $g$,
+\begin{equation}
+(g,F)\longmapsto\langle\eta(g),F\rangle
+-\int_ {Q_ L}\Psi^*(\nabla F)
+\tag{26q}
+\end{equation}
+is jointly Borel and upper semicontinuous in $F$.  The maximum
+principle gives a jointly measurable exact optimizer
+$F^{\rm opt}(c,g)$.  For an unanchored trace, subtract its value at a
+fixed corner, apply the selector, and add the value back.  This proves
+the exact conditional identity (26g), not merely an inequality between
+outer expectations.
+
+The full affine-periodic trace graph
+\begin{equation}
+\mathfrak G_ L=\{(a,c)\in\overline B_ 1\times\mathcal T_ L:
+c(L,t)-c(0,t)=La_ 1,\ c(t,L)-c(t,0)=La_ 2\}
+\tag{26r}
+\end{equation}
+is compact.  The kernel $K(c)$ is upper semicontinuous: use the
+upper semicontinuity of the realization-wise maximum and the pathwise,
+trace-independent domination
+\begin{equation*}
+K^{\rm raw}(c,\eta)\leq\int_ {Q_ L}(|Q|+M),
+\end{equation*}
+where
+$K^{\rm raw}$ denotes the maximum before expectation, in reverse
+Fatou.  Its maximizing sections are
+nonempty compact, so there is a measurable
+$a\mapsto c^*(a)$ with $K(c^*(a))=L^2\mathcal R(a)$.  A measurable periodic
+interior extension is supplied explicitly by
+\begin{equation*}
+E(c)(x)=\inf_ {y\in\partial Q_ L}\{c(y)+|x-y|\}
+\end{equation*}
+and affine-cocycle repetition; $c\mapsto E(c)$ is Lipschitz in the
+uniform norm on compact sets.  This justifies $c_ D,f_ D$, and every
+cutoff in the lower bound.  For the strict-slope extension in Definition~\ref{def:cell-operator}, one does not use the McShane formula.  Instead restrict
+the potential correspondence to $\nabla F\in K_ \Psi$; weak-* closure
+of the closed convex gradient constraint gives a compact closed graph,
+and the same selection principle supplies a compatible interior.
+
+Finally, on the compact Polish space $\mathscr A_ Q$, the effective
+dual objective
+\begin{equation}
+(P,F)\longmapsto\int_ QP\cdot\nabla F+\int_ Q\mathcal R(\nabla F)
+\tag{26s}
+\end{equation}
+is jointly Borel and upper semicontinuous in $F$: the first term is
+continuous for $P\in L^1$, and $-\mathcal R$ is convex lower
+semicontinuous.  It therefore has a coarse-measurable maximizing (or
+$\tau_{\rm sel}$-maximizing) potential.  Thus all conditional expectations in
+(21c), (26i), and (26g) are legitimate.  Letting the deterministic
+$\tau_{\rm sel}\downarrow0$ in the two
+competitor constructions proves \eqref{eq:two-scale-scalarization}.
+
+\end{proof}
+
+\section{Analytic consistency estimates}\label{sec:consistency}
+
+To identify the limit of the iterated profiles, we must determine the
+change caused by one group of $h$ levels.  For a profile viewed on the
+spatial scale $\sqrt T$, a local Hessian $H/\sqrt T$ produces a
+quadratic transport problem with energy of order $h/\sqrt T$.
+Lemma~\ref{lem:grouped-quadratic-generator} computes its coefficient
+and supplies the moment bounds needed to control the nonlinear errors.
+
+The two inequalities require different uses of this quadratic problem.
+For the upper bound, a Neumann flux is an admissible primal competitor;
+its Gaussian tails allow us to use only a local expansion of the
+profile.  For the lower bound, a Dirichlet potential must remain inside
+the region where the dual cost is quadratic.  We first prove the
+zero-boundary truncation needed to make that potential admissible.
+Finally, Lemma~\ref{lem:global-barriers} turns a local lower contact
+into an order relation on the whole space, so that the lower estimate
+can be used with monotonicity of the cell operator.
+
+\subsection{Lipschitz truncation with zero boundary data}
+
+The truncation below is used in Lemma~\ref{lem:nonlinear-consistency}.
+Besides controlling the gradient, it preserves the zero boundary values
+that allow Dirichlet potentials on different blocks to be pasted.
+
+\begin{lemma}\label{lem:lipschitz-truncation}
+Let $D$ be a square or flat torus and let $g\in W^{1,4}(D)$; in the
+square case assume $g\in W^{1,4}_ 0(D)$.  For every $\lambda>0$ there
+are an open set $E\subset D$ and a function $g_ \lambda$ such that, in
+the square case,
+\begin{equation*}
+g_ \lambda\in W^{1,\infty}(D)\cap W^{1,4}_ 0(D)
+\quad\hbox{and its zero extension is globally Lipschitz},
+\end{equation*}
+and in either case
+\begin{equation}
+\|\nabla g_ \lambda\|_ \infty\leq C\lambda,\qquad
+g_ \lambda=g\quad\hbox{on }D\setminus E,
+\tag{27}
+\end{equation}
+and
+\begin{equation}
+|E|\leq C\lambda^{-4}\int_ D|\nabla g|^4,
+\qquad
+\int_ D|\nabla g_ \lambda-\nabla g|^2
+\leq C\lambda^{-2}\int_ D|\nabla g|^4.
+\tag{28}
+\end{equation}
+
+\end{lemma}
+
+\begin{proof}
+We keep $g$ where its gradient maximal function is at most $\lambda$
+and extend these values with a controlled Lipschitz constant.  For a
+square, the extension must also take the prescribed value zero at every
+exterior point.  We verify this compatibility before constructing the
+extension; the maximal estimate will then control both errors in (28).
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Lipschitz control on the good set.
+
+In the boundary case let $\widetilde g$ be the zero extension of $g$
+to $\mathbb R^2$.  Since $g\in W^{1,4}_ 0(D)$,
+$\widetilde g\in W^{1,4}(\mathbb R^2)$ and
+$\nabla\widetilde g=1_ D\nabla g$.  Set
+\begin{equation*}
+\mathcal O=\{x\in\mathbb R^2:
+\mathcal M(|\nabla\widetilde g|)(x)>\lambda\},\qquad
+E=D\cap\mathcal O.
+\end{equation*}
+At Lebesgue points of any Sobolev function $v$, telescoping its averages
+over the balls $B(x,2^{-k}|x-y|)$, and then comparing the averages at
+$x$ and $y$ on one ball of radius $3|x-y|$, gives
+\begin{equation*}
+|v(x)-v(y)|\leq C|x-y|
+\{\mathcal M(|\nabla v|)(x)+\mathcal M(|\nabla v|)(y)\}.
+\end{equation*}
+Consequently, if $x,y\in D\setminus E$,
+\begin{equation}
+|g(x)-g(y)|\leq C\lambda|x-y|.
+\tag{28a}
+\end{equation}
+To include zero exterior data in the extension, we also need a
+Lipschitz bound between a good interior point and a point outside $D$.
+
+If $x\in D$ and $d=\operatorname {dist}(x,D^c)$, then
+$B(x,2d)\setminus D$ occupies a fixed fraction of $B(x,2d)$.
+Telescoping from $x$ to the average on that ball, followed by
+$L^1$-Poincare and $\widetilde g=0$ on the exterior fraction, gives
+\begin{equation*}
+|\widetilde g(x)|\leq Cd\mathcal M(|\nabla\widetilde g|)(x).
+\end{equation*}
+Thus, if also $x\notin\mathcal O$ and $y\in D^c$,
+\begin{equation}
+|g(x)|\leq C\lambda d\leq C\lambda|x-y|.
+\tag{28b}
+\end{equation}
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Extension with exact zero trace.
+
+It follows that the prescribed data
+\begin{equation*}
+g\ \hbox{on }D\setminus\mathcal O,\qquad
+0\ \hbox{on }\mathbb R^2\setminus D
+\end{equation*}
+are $C\lambda$-Lipschitz on their union.  Let
+$A=(D\setminus\mathcal O)\cup D^c$, let $f$ denote these data, and
+take the McShane extension
+\begin{equation*}
+\widetilde g_ \lambda(x)=\inf_ {a\in A}
+\{f(a)+C\lambda|x-a|\}.
+\end{equation*}
+Every exterior point was prescribed zero, so
+$\widetilde g_ \lambda=0$ on $\mathbb R^2\setminus D$.
+Consequently $g_ \lambda=\widetilde g_ \lambda|_ D$ belongs to
+$W^{1,\infty}(D)$, agrees with $g$ off $E$, and satisfies
+$\|\nabla g_ \lambda\|_ \infty\leq C\lambda$.  Moreover
+$|g_ \lambda(x)|\leq C\lambda\operatorname {dist}(x,D^c)$.
+If $\chi_ k$ is zero at distance $<1/k$, one at distance $>2/k$,
+and $|\nabla\chi_ k|\leq Ck$, then
+$\chi_ kg_ \lambda\to g_ \lambda$ in $W^{1,4}(D)$: both gradient-error
+terms are bounded and supported on a boundary strip whose measure tends
+to zero, while $|g_ \lambda\nabla\chi_ k|\leq C\lambda$ there.  Hence
+after mollifying each compactly supported Lipschitz cutoff,
+$g_ \lambda\in W^{1,4}_ 0(D)$.  The required zero-trace property is
+therefore in $W^{1,4}$; no closure assertion in the
+$W^{1,\infty}$-norm is needed.
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Exceptional-set and gradient estimates.
+
+The strong $L^4$ maximal estimate followed by Chebyshev gives the
+desired measure bound:
+\begin{equation}
+|E|\leq C\lambda^{-4}\int_ D|\nabla g|^4.
+\tag{28c}
+\end{equation}
+Since the gradients agree off $E$,
+\begin{equation*}
+\begin{split}
+\int_ D|\nabla g_ \lambda-\nabla g|^2
+&\leq C\lambda^2|E|+C\int_ E|\nabla g|^2\\
+&\leq C\lambda^{-2}\int_ D|\nabla g|^4,
+\end{split}
+\end{equation*}
+where the last step is Cauchy--Schwarz followed by (28c).  On a flat
+torus use the periodic maximal function and the periodic McShane
+extension of the good-set data; the same calculation proves (27)--(28).
+
+\end{proof}
+
+\subsection{Quadratic energy and Gaussian moments}
+
+The quadratic cost with matrix $H$ has dual cost with matrix $H^{-1}$.
+Its optimizer is therefore obtained by solving the elliptic equation
+with operator $L_H$ below.  In dimension two, the inverse eigenvalues
+accumulate logarithmically up to the cell resolution $2^{-h}$; their
+coefficient will be the generator of the limiting equation.  We also
+need this coefficient to be independent of the boundary trace and of
+the period $L$, and need moments of the optimizers to estimate the
+nonlinear remainders.
+
+\begin{lemma}\label{lem:grouped-quadratic-generator}
+Let $H$ be a positive definite $2\times2$ matrix and
+$n=2^h$.  On the unit square let $\Pi_ h$ be orthogonal projection
+onto functions constant on the $n^2$ small squares, followed by
+removal of the constants, and put
+\begin{equation*}
+L_ H=-\operatorname {div}(H^{-1}\nabla).
+\end{equation*}
+If $E_ {h,H}^N$ is the expected minimum of
+$\frac12\int u^THu$ under
+$-\operatorname {div}u=\eta_ h$ and zero normal boundary condition,
+and $E_ {h,H}^D$ is the corresponding Dirichlet dual value, then
+\begin{equation}
+E_ {h,H}^N=\frac12\operatorname {Tr}(\Pi_ h(L_ H^N)^{-1}),
+\qquad
+E_ {h,H}^D=\frac12\operatorname {Tr}(\Pi_ h(L_ H^D)^{-1}),
+\tag{29}
+\end{equation}
+and
+\begin{equation}
+E_ {h,H}^D,E_ {h,H}^N
+=\frac{h\log2}{4\pi}\sqrt{\det H}+o(h).
+\tag{30}
+\end{equation}
+The error is uniform for $H$ in compact subsets of the positive
+definite cone.  More precisely, define the deterministic full-trace
+quadratic value
+\begin{equation}
+\mathcal E^{\rm tr}_ {h,L}(H)=L^{-2}\max_ c\mathbb E
+\sup_ {f|_ {\partial Q_ L}=c}
+\left\{\int f\eta_ h^{(L)}
+-\frac12\int\nabla f^TH^{-1}\nabla f\right\},
+\tag{30a}
+\end{equation}
+where $c$ ranges over all affine-periodic complete traces (the affine
+slope is optimized as part of $c$).  Then
+\begin{equation}
+E_ {h,H}^D\leq\mathcal E^{\rm tr}_ {h,L}(H)\leq E_ {h,H}^N,
+\tag{30b}
+\end{equation}
+so it has the leading term (30), uniformly in the auxiliary period
+$L$.
+
+The Gaussian primal and dual optimizers used in (29) also satisfy
+\begin{equation}
+\mathbb E\fint |u|^r\leq C_ {H,r}h^{r/2},\qquad r=2,3,4.
+\tag{31}
+\end{equation}
+
+\end{lemma}
+
+\begin{proof}
+We first express each expected quadratic energy as a trace and compute
+its logarithmic leading term.  The Dirichlet and Neumann values then
+bound the complete-trace value, uniformly in $L$.  The remaining task
+is (31): a pointwise variance estimate for the Gaussian optimizers
+will imply all three moment bounds.
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Variational trace identities.
+
+For the Neumann problem, introduce a multiplier $f$, minimize first in
+$u$, and obtain
+\begin{equation*}
+\sup_ {\int f=0}\left\{\langle\eta_ h,f\rangle
+-\frac12\int\nabla f^TH^{-1}\nabla f\right\}.
+\end{equation*}
+The maximizing potential solves $L_Hf=\eta_h$, and the value is
+$\frac12\langle\eta_h,L_H^{-1}\eta_h\rangle$.  Since the covariance
+of $\eta_h$ is $\Pi_h$, taking expectation proves the first identity
+in (29).  The same computation with zero boundary values proves the
+Dirichlet identity.
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Heat cutoff and the logarithmic coefficient.
+
+It suffices to replace the cell projection in (29) by a heat cutoff at
+time $n^{-2}$ with bounded error.  This exposes the logarithmic
+contribution of the scales between $n^{-2}$ and $1$.
+Write $P_n$ for projection onto the $n^2$ cell-constant functions and
+$P_0$ for the constants, so $\Pi_h=P_n-P_0$.  Cell Poincare and
+ellipticity give, for either boundary condition,
+\begin{equation}
+\|(I-P_ n)f\|_ 2^2\leq Cn^{-2}\|\nabla f\|_ 2^2
+\leq C_ Hn^{-2}\langle L_ Hf,f\rangle.
+\tag{32a}
+\end{equation}
+Consequently
+\begin{equation}
+\operatorname {Tr}((I-P_ n)e^{-tL_ H})
+=\|(I-P_ n)e^{-tL_ H/2}\|_ {\rm HS}^2
+\leq C_ Hn^{-2}\operatorname {Tr}(L_ He^{-tL_ H}).
+\tag{32b}
+\end{equation}
+In the Neumann case all traces omit the constant mode.  The contribution
+of $0<t<n^{-2}$ to
+$\int_ 0^\infty\operatorname {Tr}(P_ ne^{-tL_ H})dt$ is at most one.
+Integrating (32b) from $n^{-2}$ to infinity gives
+\begin{equation}
+C_ Hn^{-2}\int_ {n^{-2}}^\infty
+\operatorname {Tr}(L_ He^{-tL_ H})dt
+=C_ Hn^{-2}\operatorname {Tr}(e^{-n^{-2}L_ H})=O_ H(1).
+\tag{32c}
+\end{equation}
+For Dirichlet conditions, replacing $P_n$ by $P_n-P_0$ subtracts the
+bounded rank-one term
+\[
+|Q_1|^{-1}\langle1,(L_H^D)^{-1}1\rangle.
+\]
+The spectral gap absorbs the tail $t\geq1$.  Therefore
+\begin{equation}
+\operatorname {Tr}(\Pi_ hL_ H^{-1})
+=\int_ {n^{-2}}^1\operatorname {Tr}'(e^{-tL_ H})dt+O_ H(1).
+\tag{32d}
+\end{equation}
+
+The heat-trace coefficient $\sqrt{\det H}/(4\pi t)$, together with
+the factor $1/2$ in the energy and the cutoff interval $[n^{-2},1]$,
+gives
+\begin{equation*}
+\frac12\frac{\sqrt{\det H}}{4\pi}
+\int_{n^{-2}}^1\frac{dt}{t}
+=\frac{\sqrt{\det H}}{4\pi}\log n.
+\end{equation*}
+The factor $\sqrt{\det H}$ comes from the area of the frequency
+ellipse for $L_H$.  We verify the heat-trace coefficient by the
+following bracketing argument.  The linear change of variables turning
+$L_H$ into the
+Laplacian maps the square to a parallelogram.  Tile it by squares of side
+$r$ and bracket by Dirichlet and Neumann direct sums over squares
+contained in or meeting the parallelogram.  Interior lattice counts are
+Riemann sums for
+\begin{equation*}
+(2\pi)^{-2}\int_ {\{\xi^TH^{-1}\xi\leq1\}}d\xi
+=\frac{\sqrt{\det H}}{4\pi}.
+\end{equation*}
+The squares meeting the boundary contribute at most
+$C_ H(rR+r^{-1}\sqrt R+r^{-2})$ eigenvalues below energy $R$.
+Divide by $R$, first send $R\to\infty$, and then $r\downarrow0$.
+Thus, for both boundary conditions,
+\begin{equation}
+N_ H(R)=\frac{\sqrt{\det H}}{4\pi}R+o_ H(R),
+\tag{32e}
+\end{equation}
+uniformly on compact ellipticity classes.  Equivalently,
+$t\operatorname {Tr}'(e^{-tL_ H})\to\sqrt{\det H}/(4\pi)$.
+Logarithmic Cesaro averaging in (32d) yields
+\begin{equation}
+\frac12\operatorname {Tr}(\Pi_ hL_ H^{-1})
+=\frac{\sqrt{\det H}}{4\pi}\log n+o_ H(\log n).
+\tag{32}
+\end{equation}
+Since $\log n=h\log2$, (30) follows.
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Dirichlet--Neumann squeeze.
+
+For the lower bound in (30b), paste the zero-boundary Dirichlet
+potentials on the unit outer blocks.  Their common outer trace is
+zero, so they are admissible in (30a), and their expected values add.
+For the upper bound, paste the zero-normal Neumann flows instead.
+Against any admissible full trace, integration by parts and quadratic
+completion bound the dual value by the sum of their energies.  Both
+bounds are proportional to the number $L^2$ of unit blocks, so the
+normalization in (30a) makes the squeeze uniform in $L$.  No random
+spatial mean is subtracted: the fields retain their zero-normal
+boundary condition.
+
+\smallskip\noindent
+\underline{\textit{Step 4.}} Pointwise Gaussian moments.
+
+The optimizers are linear images of the Gaussian source, so their
+pointwise moments are determined by the sum of squared coefficients.
+We will show that this sum is $O_H(1+\log n)$.  The spatial estimate
+needed for both boundary conditions is the Green-gradient bound
+$C_H|x-y|^{-1}$ in (32f): summing its squared cell contributions over
+concentric annuli will produce the logarithm in (32h).
+
+We first record the Green estimates and check that they apply after
+the anisotropic change of variables.
+
+\textbf{Dirichlet Green estimate.}  Diening, Rolfes and Salgado~\cite[Proposition 4.1]{DRS2024} state: if
+$\Omega\subset\mathbb R^d$, $d\in\{2,3\}$, is a convex polytope and
+$G:\Omega\times\Omega\to\mathbb R$ is its Green function (in the
+paper's $W^{1,2}_ 0$ framework, hence the Dirichlet Green function of
+the Laplacian), then for every $i$,
+\begin{equation}
+|\partial_ {x_ i}G(x,\xi)|\leq \frac{C_\Omega}{|x-\xi|^{d-1}}.
+\tag{32fD}
+\end{equation}
+In addition, there is $\alpha\in(0,1]$, depending only on the inner
+angles of $\Omega$, such that for every $i,j$ and all
+$x,y,\xi\in\Omega$ off the displayed diagonals,
+\begin{equation*}
+\frac{|\partial_{x_i}G(x,\xi)-\partial_{y_i}G(y,\xi)|}{|x-y|^\alpha}
+\leq C_ \Omega\bigl(
+|x-\xi|^{-d-\alpha+1}+|y-\xi|^{-d+\alpha+1}\bigr),
+\end{equation*}
+\begin{equation*}
+\frac{|\partial_{x_i}\partial_{\xi_j}G(x,\xi)-\partial_{y_i}\partial_{\xi_j}G(y,\xi)|}{|x-y|^\alpha}
+\leq C_ \Omega\bigl(
+|x-\xi|^{-d-\alpha}+|y-\xi|^{-d+\alpha}\bigr).
+\end{equation*}
+Only (32fD), the first assertion, is used below.  The proof of the cited
+proposition points to the convex-polytope Green estimates identified there;
+no smooth-boundary hypothesis is present.
+
+\textbf{Neumann heat-gradient estimate.}  Wang and Yan~\cite[Theorem 1.2]{WangYan2010} use $P_ t=e^{t\Delta_ N}$ for the
+Neumann heat semigroup on $\Omega$, $p_ t(x,y)$ for its kernel, and
+$\|\cdot\|_ {1\to\infty}$ for the $L^1$-to-$L^\infty$ operator norm.
+Its complete assertion is: if $\Omega$ is a compact convex domain in
+$\mathbb R^d$, then there are $C,c>0$ such that, for every $t>0$,
+\begin{equation}
+\|\nabla P_ t\|_ {1\to\infty}\leq Ct^{-(d+1)/2},
+\qquad
+|\nabla_ xp_ t(x,y)|\leq Ct^{-(d+1)/2}
+\exp\!\left(-\frac{|x-y|^2}{ct}\right).
+\tag{32fN}
+\end{equation}
+The theorem explicitly covers nonsmooth convex domains.  Its proof
+constructs reflecting Brownian motion on a convex domain, obtains the
+gradient contraction and the short-time heat-kernel bound, and uses the
+Neumann spectral gap for large time.  Section 4.3 of the same paper defines
+the mean-zero Neumann Green operator and records the Green-gradient
+consequence.  Indeed, in dimension two, with the normalization
+\begin{equation*}
+G^N_ \Omega(z,w)=\int_ 0^\infty
+\{p_ t(z,w)-|\Omega|^{-1}\}\,dt,
+\end{equation*}
+the derivative of the constant vanishes and (32fN) is integrable for
+$z\ne w$; differentiation first on a truncated time interval and then
+dominated convergence give
+\begin{equation}
+|\nabla_ zG^N_ \Omega(z,w)|
+\leq C\int_ 0^\infty t^{-3/2}
+e^{-|z-w|^2/(ct)}\,dt
+=\frac{C'}{|z-w|}.
+\tag{32fN'}
+\end{equation}
+
+We now check the hypotheses and the change of variables.  Let
+$S=H^{1/2}$ and $\mathcal P_ H=SQ_ 1$.  The variational change
+$z=Sx$ transforms
+$L_ H=-\operatorname {div}_ x(H^{-1}\nabla_ x)$ into the Euclidean
+Laplacian on the parallelogram $\mathcal P_ H$, preserving respectively
+Dirichlet and natural Neumann boundary conditions.  The parallelogram is
+a compact convex polygon, so (32fD) and (32fN') apply, including at its
+corners.  Green-kernel normalization gives, for either boundary condition,
+\begin{equation*}
+G_ H^\#(x,y)=(\det S)G_ {\mathcal P_ H}^\#(Sx,Sy).
+\end{equation*}
+Therefore
+\begin{equation}
+|H^{-1}\nabla_ xG_ H^\#(x,y)|
+=\det(S)|H^{-1/2}\nabla_ zG_ {\mathcal P_ H}^\#(Sx,Sy)|
+\leq C_ H|x-y|^{-1}.
+\tag{32f}
+\end{equation}
+Thus (32f) holds for the Dirichlet kernel and the mean-zero Neumann
+kernel.  Its constant is allowed to depend on the fixed
+positive-definite matrix $H$, as in (31).  We now apply this decay
+bound to the cell coefficients.
+
+If $e_ C=n\mathbf1_ C$, the coefficient of the cell Gaussian $Z_ C$
+in the primal optimizer is
+\begin{equation}
+k_ C(x)=n\left(\int_ C H^{-1}\nabla_ xG_ H^\#(x,y)\,dy
+-n^{-2}\int_ {Q_ 1}H^{-1}\nabla_ xG_ H^\#(x,y)\,dy\right).
+\tag{32g}
+\end{equation}
+For every cell meeting $B(x,2/n)$, polar integration gives
+$\int_ C|x-y|^{-1}dy\leq C/n$; hence its first term in (32g) is
+$O_ H(1)$, and the boundedly many such cells contribute $O_ H(1)$ to
+$\sum_ C|k_ C(x)|^2$.  In the annulus
+$j/n\leq\operatorname {dist}(x,C)<(j+1)/n$, there are $O(j)$
+cells and (32f) gives
+$n\int_ C|x-y|^{-1}dy\leq C/j$; together with the $O(1/n)$
+mean term estimated below, $|k_ C(x)|\leq C_ H/j$.  Summing
+$\sum_ {j\leq n}j\cdot j^{-2}$ gives
+\begin{equation}
+\sup_ x\sum_ C|k_ C(x)|^2\leq C_ H(1+\log n).
+\tag{32h}
+\end{equation}
+For the mean-subtraction term,
+$n^{-1}\int_ {Q_ 1}|x-y|^{-1}dy\leq C/n$ uniformly in $x$, so its
+squared contribution summed over all $n^2$ coefficients is $O(1)$.
+Gaussian moment identities, followed by spatial integration, prove
+(31) for both primal and dual optimizers.
+
+\end{proof}
+
+\subsection{Upper consistency from a Neumann flux}
+
+The upper estimate uses the profile only near the point being tested.
+A quadratic Neumann optimizer has size of order $\sqrt h$, whereas
+the neighborhood of the expansion has radius of order $\sqrt T$.
+Since $h/T\to0$, the Gaussian tail outside this neighborhood is
+negligible.  The argument applies also when the contact slope has
+norm one.
+
+\begin{lemma}\label{lem:localized-upper-consistency}
+Put
+\begin{equation}
+\mathcal G(H)=\frac1{4\pi}\sqrt{\det H},\qquad H\in\mathbb S_ +^2.
+\tag{33}
+\end{equation}
+Let $F_ T$ be a convex $1$-Lipschitz profile, $p_ T=\sqrt Tq_ 0$,
+and suppose that, for $|z|\leq r_ 0\sqrt T$,
+\begin{equation}
+F_ T(p_ T+z)-F_ T(p_ T)
+\leq a\cdot z+\frac1{2\sqrt T}z^THz+C\frac{|z|^3}{T}.
+\tag{33a}
+\end{equation}
+There is no restriction on $|a|\leq1$.  If $H>0$, $h\to\infty$,
+and $h/T\to0$, then, uniformly in $L$,
+\begin{equation}
+\begin{split}
+(\mathcal H_ {h,L}F_ T)(p_ T)-F_ T(p_ T)
+\leq{}&\frac{h\log2}{\sqrt T}\mathcal G(H)+\frac{o_ H(h)}{\sqrt T}\\
+&+C_ H\frac{h^{3/2}}T+C_ H\sqrt h\,e^{-c_ HT/h}.                  
+\end{split}
+\tag{33b}
+\end{equation}
+For singular $H$, the same upper consistency follows by using
+$H+\gamma I$, taking the scaling limit first, and then
+$\gamma\downarrow0$.
+
+\end{lemma}
+
+\begin{proof}
+For every realization and every zero-normal flux $u$ with
+$-\operatorname {div}u=\eta_ h^{(L)}$, integration by parts and
+Fenchel's inequality give the general primal domination
+\begin{equation}
+(\mathcal H_ {h,L}F_ T)(p)
+\leq\mathbb E\fint_ {Q_ L}F_ T(p+u(x))\,dx.
+\tag{33c}
+\end{equation}
+Choose on every unit outer block the Neumann quadratic minimizer for
+$\frac12\int u^THu$, and paste these zero-normal fields.  This is a
+linear centred Gaussian function of the source; hence
+$\mathbb E\fint u=0$.  Let
+$B=\{(\omega,x):|u(\omega,x)|>r_ 0\sqrt T\}$.  On $B^c$, insert
+(33a); on $B$, use the $1$-Lipschitz bound.  The full linear term
+vanishes in expectation, so its contribution on $B^c$ can be estimated
+on $B$ through the identity
+\begin{equation*}
+\mathbb E\fint 1_ {B^c}a\cdot u
+=-\mathbb E\fint1_ Ba\cdot u.
+\end{equation*}
+This cancellation uses the whole probability and spatial domain; the
+linear term need not vanish on $B^c$ alone.
+
+The local upper inequality in both signs forces $|a|\leq1$.
+Hence the transferred linear term and the Lipschitz contribution on
+$B$ are both bounded by $\mathbb E\fint1_ B|u|$.  The positive
+quadratic term on $B^c$ is at most its full-space value, evaluated by
+(30), while (31) bounds the cubic remainder by $C_ Hh^{3/2}/T$.
+At every fixed $x$, (32h) gives
+$\operatorname {Var}u(x)\leq C_ Hh$.  Gaussian tails, together with
+the preceding two bad-event bounds, give
+$C_ H\sqrt h\,e^{-c_ HT/h}$.  This proves (33b) for $H>0$.  If $H$ is singular,
+the Taylor quadratic is bounded above by the one with $H+\gamma I$;
+apply the preceding estimate with fixed $\gamma>0$, use (30), and only
+then send $\gamma\downarrow0$.
+
+\end{proof}
+
+\subsection{Consistency from a truncated Dirichlet potential}
+
+For a lower bound we need an admissible dual potential, not just a
+bound on its expected gradient.  The profiles below have a conjugate
+cost that is exactly quadratic near the contact slope and lies above
+that quadratic everywhere.  The global inequality bounds the cell
+value from above.  To obtain the matching lower bound, we truncate a
+Dirichlet optimizer so that every gradient lies in the region of
+quadratic equality.  These are the profiles used for the lower
+barriers in the next subsection.
+
+\begin{lemma}\label{lem:nonlinear-consistency}
+Use $\mathcal G$ from (33).  Let $\psi$ be either a global convex
+$1$-Lipschitz cone-growth profile or a proper closed convex profile
+whose conjugate domain is compactly contained in $B_ 1$,
+let $q_ 0\in\mathbb R^2$, and suppose
+$a_ 0\in\partial\psi(q_ 0)$ lies in the open unit ball.  Assume that,
+on $\overline B_ 1-a_ 0$, its conjugate has the exact local form
+\begin{equation}
+\psi^*(a_ 0+b)=\psi^*(a_ 0)+q_ 0\cdot b+D(b),
+\tag{34}
+\end{equation}
+where $D(0)=0$, $D$ is convex, and, for some $\rho>0$,
+\begin{equation}
+D(b)=\tfrac12b^TH^{-1}b\quad\text{if }|b|_ {H^{-1}}\leq\rho.
+\tag{34a}
+\end{equation}
+Assume on its whole effective domain that
+\begin{equation*}
+D(b)\geq Q(b):=\tfrac12b^TH^{-1}b;
+\end{equation*}
+thus $D$ is the quadratic near zero plus a convex exterior wall.  Put
+$\Psi_ T(p)=\sqrt T\,\psi(p/\sqrt T)$ and
+$p_ T=\sqrt Tq_ 0$.  If $H>0$, $h\to\infty$, and
+$T/h\to\infty$, then, uniformly in $L$,
+\begin{equation}
+\begin{split}
+&(\mathcal H_ {h,L}\Psi_ T)(p_ T)-\Psi_ T(p_ T)\\
+&\quad=\frac{h\log2}{\sqrt T}\,\mathcal G(H)+\frac{o_ H(h)}{\sqrt T}
++O_ H\!\left(\frac{h^2}{T^{3/2}}\right).
+\end{split}
+\tag{35}
+\end{equation}
+This lemma is used only with $H>0$ and an interior dual slope.
+
+\end{lemma}
+
+\begin{proof}
+After removing the affine part in (34), we will bound the increment
+between the Dirichlet and Neumann quadratic values, divided by
+$\sqrt T$, with an additional lower-bound error of order
+$h^2/T^{3/2}$.  Since both quadratic values have the leading term
+(30), this proves (35).  The only change needed in the quadratic
+Dirichlet competitor is a truncation that keeps its gradient in the
+set where $D=Q$.
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Dual reduction and quadratic value.
+
+Since $\Psi_ T^*=\sqrt T\,\psi^*$, the definition (16) and (34) turn
+the increment on the left of (35) exactly into
+\begin{equation}
+\mathcal V_ D=L^{-2}\max_ c\mathbb E\sup_ {f|_ {\partial Q_ L}=c}
+\left\{\int f\eta_ h^{(L)}-\sqrt T\int D(\nabla f)\right\}.
+\tag{36}
+\end{equation}
+The term $p_ T\cdot a$ cancels the spatial average of the linear term
+in (34), and the remaining affine source term has expectation zero.  For
+$Q(b)=\frac12b^TH^{-1}b$, the change of variable
+$g=\sqrt T f$ and (30a) give
+\begin{equation}
+\mathcal V_ Q=T^{-1/2}\mathcal E^{\rm tr}_ {h,L}(H).
+\tag{37}
+\end{equation}
+Lemma~\ref{lem:grouped-quadratic-generator} evaluates this quadratic
+value.  To obtain a lower bound for the nonlinear value, we now keep
+the Dirichlet competitor inside the region where the costs agree.
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Truncated Dirichlet competitor.
+
+Let $f_D$ be the zero-boundary Dirichlet dual optimizer for the
+unscaled quadratic problem, pasted over the unit blocks, and put
+$b_D=T^{-1/2}\nabla f_D$.  Equation (31) gives
+\begin{equation}
+\mathbb E\fint|b_ D|^4\leq C_ H(h/T)^2,\qquad
+\sup_ x\mathbb E|b_ D(x)|^2\leq C_ Hh/T.
+\tag{37a}
+\end{equation}
+These moment bounds do not ensure that the Gaussian optimizer stays
+pointwise in the set where $D=Q$.  Apply
+Lemma~\ref{lem:lipschitz-truncation} to $f_ D/\sqrt T$ at a threshold
+$\lambda$, fixed independently of $h$ and $T$, so that its resulting
+bound $C\lambda$ is
+smaller than both
+$\rho/\|H^{-1/2}\|$ and
+$\operatorname {dist}(a_ 0,\partial B_ 1)$.  The zero extension is
+globally Lipschitz and belongs to $W^{1,4}_ 0$, so the truncated block
+potentials paste with exactly zero trace.  By (28) and (37a), the
+expected squared gradient error is at most $C_H(h/T)^2$ per unit
+area.  Quadratic completion multiplies this error by $\sqrt T$,
+the coefficient of the cost in (36).  Thus the lost value is at most
+$C_Hh^2/T^{3/2}$.
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Comparison of the two values.
+
+Since $D\geq Q$, (37) and the upper bound in (30b) bound
+$\mathcal V_D$ by $T^{-1/2}E_{h,H}^N$.  The truncated competitor has
+zero trace and stays everywhere in the region where $D=Q$, so its
+value is at least $T^{-1/2}E_{h,H}^D$ minus the preceding error.
+Applying (30) to these two bounds proves (35).  The construction and
+the error estimate are blockwise, hence uniform in $L$.
+
+\end{proof}
+
+\subsection{Global barriers for local lower contacts}
+
+Monotonicity of the cell operator compares profiles on the whole
+space, whereas a viscosity test initially gives only a local order
+relation.  We therefore replace a local lower test by a global convex
+profile below the spatial slice.  It must retain almost the same
+Hessian at the contact, meet the hypotheses of
+Lemma~\ref{lem:nonlinear-consistency}, and grow strictly more slowly
+than the slice at infinity.  The last property keeps the later
+minimizing points in a compact set.  The uniform estimate (38c) is
+needed because these points will approach, rather than equal, the
+original contact point.
+
+\begin{lemma}\label{lem:global-barriers}
+Let $U$ be convex and $1$-Lipschitz, with
+$|p|-C\leq U(p)\leq|p|+C$.  Suppose a convex $C^2$ function
+$\phi$ touches $U$ strictly from below at $q_ 0$,
+$|a_ 0|:=|\nabla\phi(q_ 0)|<1$, and
+$H=D^2\phi(q_ 0)>0$.  For every
+$0<\delta<\lambda_ {\min}(H)$ there is a global proper convex barrier
+$B_ \delta\leq U$, touching at $q_ 0$, such that
+\begin{equation}
+B_ \delta(q)<U(q)\quad(q\ne q_ 0),\qquad
+D^2B_ \delta(q_ 0)=H-\delta I,
+\tag{38a}
+\end{equation}
+and
+\begin{equation}
+\operatorname {dom}B_ \delta^*\Subset B_ 1,\qquad
+U(q)-B_ \delta(q)\longrightarrow+\infty
+\quad\text{as }|q|\to\infty.
+\tag{38b}
+\end{equation}
+Near $a_ 0$, its conjugate is exactly quadratic with Hessian
+$(H-\delta I)^{-1}$.  Its conjugate Bregman gap---that is,
+$B_\delta^*(a+b)-B_\delta^*(a)-\nabla B_\delta^*(a)\cdot b$---based at every
+slope sufficiently near $a_ 0$, is bounded below globally by this
+same quadratic form and equals it for small increments.  Consequently,
+for
+$(B_ \delta)_ T(p)=\sqrt T B_ \delta(p/\sqrt T)$,
+\begin{equation}
+(\mathcal H_ {h,L}(B_ \delta)_ T)(\sqrt Tq_ 0)
+-(B_ \delta)_ T(\sqrt Tq_ 0)
+=\frac{h\log2}{\sqrt T}\mathcal G(H-\delta I)+\frac{o_ {H,\delta}(h)}{\sqrt T}
++O_ {H,\delta}\!\left(\frac{h^2}{T^{3/2}}\right).
+\tag{38}
+\end{equation}
+Moreover, there is a neighborhood $V$ of $q_ 0$ on which
+\begin{equation}
+\sup_ {q\in V}\left|
+\frac{\sqrt T}{h\log2}
+\left\{(\mathcal H_ {h,L}(B_ \delta)_ T)(\sqrt Tq)
+-(B_ \delta)_ T(\sqrt Tq)\right\}
+-\mathcal G(H-\delta I)\right|\longrightarrow0
+\tag{38c}
+\end{equation}
+whenever $h\to\infty$ and $h/T\to0$, uniformly in $L$.
+No global upper barrier is asserted or needed.
+
+\end{lemma}
+
+\begin{proof}
+Write $g=U^*$.  Since conjugation reverses order, it is enough to
+construct a convex function above $g$ whose conjugate has the desired
+contact.  The local test gives a quadratic upper bound for $g$ near
+$a_0$.  We extend that bound over a compact ball inside $B_1$, with
+strict inequality away from $a_0$, and set it equal to $+\infty$
+outside the ball.  This choice will give both the global order and
+the slower growth required in (38b).
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} The dual contact and a strict quadratic bound.
+
+The conjugate $g$ is finite and continuous in $B_ 1$ and is
+$+\infty$ off $\overline B_ 1$.  The local lower contact and
+convexity give $a_ 0\in\partial U(q_ 0)$, so $q_ 0$ maximizes
+\begin{equation}
+g(a_ 0)=\sup_ q\{a_ 0\cdot q-U(q)\}.
+\tag{39}
+\end{equation}
+It is the unique maximizer.  Indeed, a second maximizer would make
+$U$ affine with slope $a_ 0$ on the segment joining it to $q_ 0$.
+The positive-definite quadratic term of the lower test would then put
+$\phi$ strictly above that affine function immediately away from
+$q_ 0$, contrary to the local lower contact.
+
+Choose $r<1$ so that a neighborhood of $a_ 0$ is contained in
+$B_ r$.  From the lower cone bound,
+\begin{equation}
+a\cdot q-U(q)\leq-(1-r)|q|+C\qquad(a\in B_ r).
+\tag{40}
+\end{equation}
+Thus all maximizers defining $g(a)$ for $a$ near $a_ 0$ lie in
+one compact set.  Uniqueness in (39) further implies that these
+maximizers converge to $q_ 0$ as $a\to a_ 0$.  They consequently
+lie, after the slope neighborhood is reduced, in the neighborhood
+where $U\geq\phi$.  The local Legendre transform of $\phi$ has
+Hessian $H^{-1}$ at $a_ 0$.  Comparing first with
+$H-\frac\delta2I$, and only then with $H-\delta I$, gives, for
+all sufficiently small $v$,
+\begin{equation}
+\begin{split}
+g(a_ 0+v)-g(a_ 0)-q_ 0\cdot v
+&\leq\frac12v^T(H-\tfrac\delta2I)^{-1}v\\
+&\leq\frac12v^T(H-\delta I)^{-1}v-c_ \delta|v|^2
+\end{split}
+\tag{41}
+\end{equation}
+for some $c_ \delta>0$.  The strict second inequality is the
+ingredient that prevents any further contact.
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Extension beyond the contact slope.
+
+We now extend the quadratic bound while leaving it unchanged near
+$a_0$.  Choose the radius of the quadratic region and the compact
+dual domain first; then choose the coefficient of a convex term to
+dominate the remaining annulus.
+
+Put $A_ \delta=(H-\delta I)^{-1}$ and
+$Q_ \delta(v)=\frac12v^TA_ \delta v$.  Choose
+\begin{equation*}
+0<2\rho<d<\operatorname {dist}(a_ 0,\partial B_ 1)
+\end{equation*}
+so that (41) holds for $|v|\leq2\rho$, and, on $|v|\leq d$, set
+\begin{equation}
+D(v)=Q_ \delta(v)+C_ \rho(|v|-\rho)_ +^2.
+\tag{41a}
+\end{equation}
+This is convex and equals $Q_ \delta$ on $|v|\leq\rho$.  Choose
+$C_ \rho>0$ strictly larger than
+\begin{equation}
+\max\!\left\{0,\
+\sup_ {2\rho\leq|v|\leq d}
+\frac{g(a_ 0+v)-g(a_ 0)-q_ 0\cdot v-Q_ \delta(v)}
+{(|v|-\rho)^2}\right\}.
+\tag{41b}
+\end{equation}
+The supremum is finite by continuity on the compact annulus.
+Equations (41)--(41b) imply
+\begin{equation}
+D(v)>g(a_ 0+v)-g(a_ 0)-q_ 0\cdot v
+\qquad(0<|v|\leq d).
+\tag{41c}
+\end{equation}
+\smallskip\noindent
+\underline{\textit{Step 3.}} The global lower barrier.
+
+Define the proper closed convex function
+\begin{equation}
+\widetilde g(a_ 0+v)=g(a_ 0)+q_ 0\cdot v+D(v)
+\quad(|v|\leq d),\qquad
+\widetilde g=+\infty\quad(|v|>d),
+\tag{41d}
+\end{equation}
+and set $B_ \delta=\widetilde g^*$.  We have
+$\widetilde g\geq g$, with equality among its effective slopes only
+at $a_ 0$; hence $B_ \delta\leq U$.  At $q_ 0$, the expression
+defining $B_ \delta(q_ 0)$ is $U(q_ 0)-D(v)$, so its unique maximizing
+slope is $a_ 0$ and $B_ \delta(q_ 0)=U(q_ 0)$.
+
+If equality $B_ \delta(q)=U(q)$ held elsewhere, a maximizing slope
+for the compact-domain conjugate $B_ \delta(q)$ would have to be a
+slope where $\widetilde g=g$, hence $a_ 0$.  But
+$\widetilde g$ is differentiable at $a_ 0$, with gradient $q_ 0$,
+so $a_ 0$ can maximize its conjugate only at $q=q_ 0$.  This proves
+the strict assertion in (38a).  Since (41d) is exactly affine plus
+$Q_ \delta$ near $a_ 0$, local conjugacy gives
+$D^2B_ \delta(q_ 0)=H-\delta I$.  Also
+$\operatorname {dom}B_ \delta^*=\overline B_ d(a_ 0)\Subset B_ 1$,
+so $B_ \delta(q)\leq r_ \delta|q|+C_ \delta$ for some
+$r_ \delta<1$.  The lower cone bound for $U$ proves (38b).
+
+\smallskip\noindent
+\underline{\textit{Step 4.}} Uniform Bregman gap and consistency.
+
+The discrete contact will occur at slopes near $a_0$, so consistency
+at $a_0$ alone is insufficient.  We verify the same quadratic-gap
+hypotheses uniformly at these nearby slopes.  Write the wall in
+(41a) as $W$.  If $|a-a_0|<\rho/4$, then, for every increment
+$b$ for which the left side is finite,
+\begin{equation}
+\begin{split}
+&B_ \delta^*(a+b)-B_ \delta^*(a)
+-\nabla B_ \delta^*(a)\cdot b\\
+&\qquad=Q_ \delta(b)+
+\{W(a-a_ 0+b)-W(a-a_ 0)-\nabla W(a-a_ 0)\cdot b\}
+\geq Q_ \delta(b).                                             
+\end{split}
+\tag{41e}
+\end{equation}
+For increments outside the compact conjugate domain the left side is
+$+\infty$.  Equality holds for all sufficiently small $b$,
+uniformly for $a$ in a smaller ball.  Thus the hypotheses and all
+constants in Lemma~\ref{lem:nonlinear-consistency} hold uniformly for the
+corresponding spatial points $q$ near $q_ 0$.  The strict-slope
+extension in Definition~\ref{def:cell-operator} has an attained cell
+value and is monotone, as proved in Proposition~\ref{prop:cell-operator-properties}.  Lemma~\ref{lem:nonlinear-consistency} gives
+(38), and, after division by $h\log2/\sqrt T$, gives (38c), because
+its two normalized errors are $o(1)$ and $O(h/T)$.
+
+\end{proof}
+
+\section{The convex viscosity limit}\label{sec:viscosity}
+
+We now show that many small cell-operator increments converge to the
+evolution with generator $\mathcal G$.  There are two tasks: identify
+the equation satisfied in the limit, and prove uniqueness in the class
+of convex profiles with bounded corrections to $|q|$.  The first uses
+the local Gaussian upper estimate and the global lower barriers from
+the preceding section.  The second requires a comparison argument on
+$\mathbb R^2$, where a maximizing pair of spatial points can escape
+to infinity together.
+
+\begin{lemma}\label{lem:viscosity-limit}
+Let $h_ m\to\infty$, $r_ m\to\infty$, and $h_ m/r_ m\to0$, and let
+$L_ m$ be arbitrary integers tending to infinity.  For each $m$, define the
+$m$th row of the triangular monotone scheme by
+\begin{equation}
+F_0^{(m)}(p)=|p|,\qquad
+F_{k+1}^{(m)}=\mathcal H_{h_m,L_m}F_k^{(m)},
+\qquad t_k^{(m)}=k h_m\log2.
+\tag{42}
+\end{equation}
+Thus $h_m$ and $L_m$ are fixed during the iteration in row $m$, while the
+row parameters vary with $m$.  Use piecewise-constant interpolation in the
+physical time $t$ and then rescale time by $r_m$; equivalently, $U_m$ below is
+constant on each interval
+$[t_k^{(m)}/r_m,t_{k+1}^{(m)}/r_m)$.  Thus
+\begin{equation}
+U_ m(s,q)=r_ m^{-1/2}F_{\lfloor sr_ m/(h_ m\log2)\rfloor}^{(m)}
+(\sqrt{r_ m}\,q)
+\tag{43}
+\end{equation}
+converges locally uniformly, at every fixed positive time, to the unique
+convex cone-growth viscosity solution of
+\begin{equation}
+\partial_ sU=\mathcal G(D_ q^2U)=\frac1{4\pi}\sqrt{\det D_ q^2U},
+\qquad U(0,q)=|q|.
+\tag{44}
+\end{equation}
+Here the viscosity formulation is the strong convex one:
+$U(s,\cdot)$ is convex; every upper test, and every lower test whose
+spatial Hessian is positive semidefinite, satisfies the corresponding
+evolution inequality, including when that Hessian is singular.  In
+particular, with $\kappa=U(1,0)$, every integer sequence $k_m$ satisfying
+the conditions below obeys
+\begin{equation}
+\frac{F_{k_m}^{(m)}(0)}{\sqrt{t_{k_m}^{(m)}}}\longrightarrow\kappa
+\quad\hbox{whenever }t_{k_m}^{(m)}\to\infty,
+\quad h_m/t_{k_m}^{(m)}\to0.
+\tag{45}
+\end{equation}
+
+\end{lemma}
+
+\begin{proof}
+We first obtain the time modulus and identify the two viscosity
+inequalities.  For an upper contact the Gaussian flux uses only the
+local test.  For a lower contact we minimize the difference from a
+global spatial barrier; the resulting scalar function of time retains
+the contact derivative and satisfies the discrete inequality (47i).
+We then prove comparison.  Translating a maximizing pair by its
+common center allows us to remove the spatial localization while
+retaining the matrix order supplied by the relative quadratic
+penalty.  Uniqueness and scaling will give (45).
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Stability, compactness, and the initial trace.
+
+The one-step bound (16a), summed directly, is too large for the time
+modulus we need.  We instead iterate its primal bound using
+independent centered fluxes, whose second moments add.
+Let $Q$ be the pasted linear fine flux in (16b), let $X$ be uniform
+on $Q_{L_m}$, independent of the source, and put $Z=Q(X)$.  Then
+$\mathbb EZ=0$ and
+$\mathbb E|Z|^2\leq Ch_ m$.  Equation (16b), before using the
+Lipschitz estimate, gives the stronger domination
+\begin{equation}
+(\mathcal H_ {h_ m,L_ m}\Psi)(p)\leq\mathbb E\Psi(p+Z)
+\tag{45a}
+\end{equation}
+for every admissible profile $\Psi$.  Use independent copies of the
+fine source, the uniform point, and hence $Z$, at successive
+iterations.  Repeated application of (45a) within row $m$ gives
+\begin{equation*}
+F_{k+\ell}^{(m)}(p)
+\leq\mathbb E F_k^{(m)}(p+Z_ 1+\cdots+Z_ \ell).
+\end{equation*}
+Since every $F_k^{(m)}$ is $1$-Lipschitz,
+\begin{equation}
+0\leq F_{k+\ell}^{(m)}(p)-F_k^{(m)}(p)\leq C\sqrt{\ell h_m},
+\qquad |p|\leq F_k^{(m)}(p)\leq|p|+C\sqrt{k h_m}.
+\tag{46}
+\end{equation}
+Consequently, at grid times,
+\begin{equation}
+|U_ m(s,q)-U_ m(t,q)|
+\leq C\sqrt{|s-t|}+C\sqrt{h_ m/r_ m},
+\tag{46a}
+\end{equation}
+while the spatial Lipschitz constant is one.  Thus (43) is locally
+equicontinuous and
+$0\leq U_ m(s,q)-|q|\leq C\sqrt s+o(1)$, which gives the initial
+trace uniformly on $\mathbb R^2$.
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Upper half-relaxed limit and the subsolution inequality.
+
+For consistency put $\Delta_m=h_m\log2/r_m$ and
+$U_m^k(q):=U_m(k\Delta_m,q)$, and define
+\begin{equation}
+(S_ m\varphi)(q)=r_ m^{-1/2}\mathcal H_ {h_ m,L_ m}
+[p\mapsto\sqrt{r_ m}\,\varphi(p/\sqrt{r_ m})](\sqrt{r_ m}q).
+\tag{46b}
+\end{equation}
+The map is monotone and constant-equivariant.
+We use the standard half-relaxed limits
+\[
+\overline U(s,q)=\limsup_{\substack{m\to\infty\\(s',q')\to(s,q)}}
+U_m(s',q'),\qquad
+\underline U(s,q)=\liminf_{\substack{m\to\infty\\(s',q')\to(s,q)}}
+U_m(s',q').
+\]
+
+Let a smooth convex $\phi$ touch the upper half-relaxed limit strictly
+from above at $(s_0,q_0)$, $s_0>0$.  We must bound its time derivative
+by $\mathcal G(D_q^2\phi)$ using only this local contact.
+Select grid maxima
+$(s_ m,q_ m)=(k_ m\Delta_ m,q_ m)\to(s_ 0,q_ 0)$ in a fixed small
+parabolic cylinder.  If $V_ m$ is the pasted Neumann quadratic flux for
+$D_ q^2\phi(s_ 0,q_ 0)+\gamma I$, the primal domination (33c), expressed
+in the rescaled variables, gives
+\begin{equation}
+U_ m^{k_ m}(q_ m)
+\leq\mathbb E\fint
+U_ m^{k_ m-1}(q_ m+V_ m(x)/\sqrt{r_ m})\,dx.
+\tag{46c}
+\end{equation}
+On $|V_ m|\leq r_ 0\sqrt{r_ m}$, maximality in the cylinder bounds the
+right side by the same expectation with $U_ m$ replaced by
+$\phi$, plus the contact constant.  On the complementary event, the
+cone bounds (46), the spatial Lipschitz bound, and (32h) give
+$C\sqrt{h_ m/r_ m}\exp(-c r_ m/h_ m)$, which is
+$o(\Delta_ m)$.  Taylor expansion of
+\begin{equation*}
+\sqrt{r_ m}\{\phi(s_ m-\Delta_ m,q_ m+z/\sqrt{r_ m})
+-\phi(s_ m-\Delta_ m,q_ m)\}
+\end{equation*}
+has exactly the form (33a).  The centred linear term vanishes.  Lemma~\ref{lem:localized-upper-consistency} therefore yields
+\begin{equation}
+\frac{\phi(s_ m,q_ m)-\phi(s_ m-\Delta_ m,q_ m)}{\Delta_ m}
+\leq \mathcal G(D_ q^2\phi(s_ 0,q_ 0)+\gamma I)+o(1).
+\tag{46d}
+\end{equation}
+First let $m\to\infty$ and then $\gamma\downarrow0$.  This proves
+\begin{equation}
+\phi_ s(s_ 0,q_ 0)\leq \mathcal G(D^2\phi(s_ 0,q_ 0)),
+\tag{47}
+\end{equation}
+including unit slopes and singular upper jets.  No global upper barrier
+is used.
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Lower contact and the scalar minimum gap.
+
+For a lower contact, the test itself need not lie below the preceding
+time slice on the whole space, so it cannot be inserted directly into
+the monotone scheme.  We use Lemma~\ref{lem:global-barriers} to fix
+a global spatial barrier and allow only its additive constant to vary
+with time.  For every $S<\infty$, the stability estimates pass to the
+limit on $0\leq s,t\leq S$:
+\begin{equation}
+|\underline U(s,q)-\underline U(t,q)|
+\leq C\sqrt{|s-t|},\qquad
+|q|\leq\underline U(s,q)\leq|q|+C_ S.
+\tag{47a}
+\end{equation}
+Let a smooth convex $\phi$ touch $\underline U$ strictly from
+below at $(s_ 0,q_ 0)$, with $s_ 0>0$, and put
+\begin{equation}
+\tau=\phi_ s(s_ 0,q_ 0),\qquad
+a_ 0=D_ q\phi(s_ 0,q_ 0),\qquad
+H=D_ q^2\phi(s_ 0,q_ 0)>0.
+\tag{47b}
+\end{equation}
+First suppose $|a_ 0|<1$.  Fix
+$0<\delta<\lambda_ {\min}(H)$ and apply Lemma~\ref{lem:global-barriers} to the spatial slice
+$q\mapsto\underline U(s_ 0,q)$, using
+$q\mapsto\phi(s_ 0,q)$ as its lower test.  Denote the resulting
+barrier by $B_ \delta$.
+
+The largest constant that can be added to this barrier at time $s$ is
+\begin{equation}
+c(s)=\min_ {q\in\mathbb R^2}
+\{\underline U(s,q)-B_ \delta(q)\}.
+\tag{47c}
+\end{equation}
+The minimum is attained, uniformly for $s$ near $s_ 0$, because
+(47a) and (38b) make the expression uniformly coercive.  Strict global
+contact gives
+\begin{equation}
+c(s_ 0)=0,\qquad
+\operatorname {argmin}_ q
+\{\underline U(s_ 0,q)-B_ \delta(q)\}=\{q_ 0\}.
+\tag{47d}
+\end{equation}
+The common time modulus, strictness on compact annuli, and coercivity
+then imply that every minimizer in (47c) converges to $q_ 0$ as
+$s\to s_ 0$.
+
+To preserve the original time derivative $\tau$, we need a smooth
+lower test for $c$ with that derivative at $s_0$.  More precisely,
+there are $K,r>0$ such that
+\begin{equation}
+c(s)\geq\ell(s):=\tau(s-s_ 0)-K(s-s_ 0)^2
+\quad\text{for }|s-s_ 0|\leq r,\qquad c(s_ 0)=\ell(s_ 0).
+\tag{47e}
+\end{equation}
+Indeed, all relevant minimizers lie in the parabolic neighborhood
+where $\underline U\geq\phi$.  Put $z=q-q_ 0$ and
+$\sigma=s-s_ 0$.  The exact local quadratic formula for $B_ \delta$
+and the spacetime Taylor expansion of $\phi$ give
+\begin{equation}
+\phi(s,q)-B_ \delta(q)
+=\tau\sigma+\frac\delta2|z|^2
++\sigma D^2_ {sq}\phi(s_ 0,q_ 0)\cdot z
++O(\sigma^2)+o(|z|^2).
+\tag{47f}
+\end{equation}
+After shrinking $r$, absorb the last spatial remainder into
+$\delta|z|^2/4$.  Completing the square absorbs the mixed term at a
+cost of order $\sigma^2$, which proves (47e).  The small Hessian loss
+$\delta I$ in the barrier is what permits this absorption.
+
+\smallskip\noindent
+\underline{\textit{Step 4.}} Discrete contacts and the one-step inequality.
+
+It suffices to compare the time increment of this minimum with the
+one-step increment of $B_\delta$.  Temporal contact will bound the
+former from above by the derivative of $\ell$; global spatial order
+and monotonicity will bound it from below by the latter.  The uniform
+consistency (38c) then supplies the desired inequality for $\tau$.
+
+At grid times put
+\begin{equation}
+c_ m^k=\min_ q\{U_ m^k(q)-B_ \delta(q)\},
+\tag{47g}
+\end{equation}
+and choose a minimizer $q_ m^k$.  These minima are attained, and their
+minimizers are uniformly bounded near $s_ 0$, since
+\begin{equation*}
+U_ m^k(q)-B_ \delta(q)
+\geq(1-r_ \delta)|q|-C_ \delta.
+\end{equation*}
+The lower half-relaxed limit of the scalar grid functions $c_ m$ is
+exactly $c$.  For the lower bound, take minimizing points, use their
+compactness, and invoke the definition of $\underline U$.  For the
+reverse bound, take a minimizer of (47c), use a recovery sequence for
+$\underline U$ there, and move its time coordinate to the nearest
+grid time using (46a).
+
+Fix $\nu>0$ and replace $\ell$ on
+$[s_ 0-r,s_ 0+r]$ by
+$\ell_ \nu(s)=\ell(s)-\nu(s-s_ 0)^4$.  Then
+$c-\ell_ \nu$ has its unique minimum at $s_ 0$, and
+$\ell_ \nu'(s_ 0)=\tau$.  Minimizing
+$c_ m^k-\ell_ \nu(k\Delta_ m)$ over the grid points in this interval
+and using the preceding half-relaxed-limit equality produces interior
+indices $k_ m$ such that
+\begin{equation}
+t_ m=k_ m\Delta_ m\longrightarrow s_ 0,\qquad
+c_ m^{k_ m}-\ell_ \nu(t_ m)
+\leq c_ m^j-\ell_ \nu(j\Delta_ m)
+\tag{47h}
+\end{equation}
+for every grid point $j\Delta_ m$ in the interval.  If
+$q_ m=q_ m^{k_ m}$, every subsequential limit of $q_ m$, together with
+the recovery upper bound implicit in this selection, attains the
+minimum in (47d).  Hence $q_ m\to q_ 0$.
+
+By the definition of $c_ m^{k_ m-1}$,
+\begin{equation*}
+U_ m^{k_ m-1}\geq B_ \delta+c_ m^{k_ m-1}.
+\end{equation*}
+Using $U_ m^{k_ m}=S_ mU_ m^{k_ m-1}$, monotonicity and constant
+equivariance, and then evaluating at the current minimizer $q_ m$,
+gives the exact recursion
+\begin{equation}
+c_ m^{k_ m}-c_ m^{k_ m-1}
+\geq S_ mB_ \delta(q_ m)-B_ \delta(q_ m).
+\tag{47i}
+\end{equation}
+On the other hand, (47h), applied also at $k_ m-1$, gives
+\begin{equation}
+c_ m^{k_ m}-c_ m^{k_ m-1}
+\leq\ell_ \nu(t_ m)-\ell_ \nu(t_ m-\Delta_ m).
+\tag{47j}
+\end{equation}
+Divide by $\Delta_ m$.  Since $q_ m\to q_ 0$, the uniform consistency
+(38c), written in the variables (46b), makes the right side of (47i)
+converge to $\mathcal G(H-\delta I)$; the quotient in (47j) converges to
+$\ell_ \nu'(s_ 0)=\tau$.  Therefore
+\begin{equation*}
+\phi_ s(s_ 0,q_ 0)\geq \mathcal G(H-\delta I).
+\end{equation*}
+Letting $\delta\downarrow0$ proves the supersolution inequality for
+positive-definite interior-slope lower jets.
+
+\smallskip\noindent
+\underline{\textit{Step 5.}} Singular Hessians and unit slopes.
+
+If a lower jet has positive-semidefinite singular spatial Hessian, the
+pointwise scheme monotonicity $U_ m^{k+1}\geq U_ m^k$ passes to the
+limit.  Testing this temporal monotonicity from the past gives
+$\phi_ s\geq0=\mathcal G(H)$.  Finally, if $|a_ 0|=1$, convexity and the
+$1$-Lipschitz bound imply
+\begin{equation*}
+\underline U(s_ 0,q_ 0+ta_ 0)=\underline U(s_ 0,q_ 0)+t
+\qquad(t\geq0).
+\end{equation*}
+The lower-contact inequality along this ray gives
+$a_ 0^THa_ 0\leq0$.  For $H\geq0$, this forces $Ha_ 0=0$, so $H$
+is singular and the preceding argument applies.  Every subsequential
+limit is therefore a strong convex viscosity solution of (44).  To
+identify all subsequential limits, it remains to prove comparison in
+this precise class.
+
+\smallskip\noindent
+\underline{\textit{Step 6.}} Whole-space localization for comparison.
+
+For completeness, we prove comparison in the precise class produced by
+(46)--(46a): the functions are continuous, convex and $1$-Lipschitz
+in space, nondecreasing in time, have bounded cone corrections on
+finite time intervals, and share a spatially uniform time modulus.
+Let $u$ be a subsolution and $v$ a strong convex supersolution in
+this class, with $u(0,\cdot)\leq v(0,\cdot)$, and suppose that
+$u-v>0$ somewhere before a time $S$.
+
+We need an interior maximum to which the doubled-variable lemma
+applies.  The terminal penalty below creates a positive gap between
+the time derivatives, the relative quadratic controls $x-y$, and the
+last term makes the common spatial position bounded.
+Choose the parameters in the order $\gamma$, then $\epsilon$, then
+$\eta$.  Take $\gamma>0$ small enough that the violation survives
+the terminal penalty, and then $\epsilon>0$ small enough for (48a)
+to exclude the initial time.  Finally choose $\eta>0$ for spatial
+coercivity; it will tend to zero with $\epsilon$ fixed.  Maximize
+\begin{equation}
+\begin{split}
+\mathcal M_ {\epsilon,\eta}(t,x,y)
+={}&u(t,x)-v(t,y)-\frac{|x-y|^2}{2\epsilon}
+-\frac{\gamma}{S-t}\\
+&-\eta\{\chi(x)+\chi(y)\},\qquad
+\chi(x)=\sqrt{1+|x|^2},                                  
+\end{split}
+\tag{48}
+\end{equation}
+over $0\leq t<S$.  Since
+\begin{equation*}
+u(t,x)-v(t,y)\leq |x-y|+2C_ S,
+\end{equation*}
+the relative quadratic controls $x-y$, and the last term is
+coercive in the common-translation direction.  Thus the positive
+maximum is attained.  At $t=0$, initial ordering and the spatial
+Lipschitz bound of $v$ give
+\begin{equation}
+u(0,x)-v(0,y)-\frac{|x-y|^2}{2\epsilon}
+\leq |x-y|-\frac{|x-y|^2}{2\epsilon}\leq\frac\epsilon2.
+\tag{48a}
+\end{equation}
+Taking $\epsilon<2\gamma/S$, the common time modulus keeps positive
+maximizers a fixed distance from $t=0$.  The term
+$-\gamma/(S-t)$ keeps them a fixed distance from $S$.
+
+Before comparing Hessians, we remove the coercive term.  Although
+the common center may then escape, translation by this center leaves
+the relative quadratic unchanged.  Fix $\epsilon$, let
+$\eta_n\downarrow0$, and let
+$(t_ n,x_ n,y_ n)$ be maximizers.  The preceding cone estimate and
+positivity of the maximum show that $d_ n=x_ n-y_ n$ is bounded.  Pass
+to a subsequence with
+\begin{equation*}
+t_ n\to t_ *\in(0,S),\qquad d_ n\to d.
+\end{equation*}
+The common centres $c_ n=(x_ n+y_ n)/2$ may escape.  Translate both
+functions by this same centre, and normalize only their vertical
+constants:
+\begin{equation}
+\widehat u_ n(t,z)=u(t,z+c_ n)-u(t_ n,x_ n),\qquad
+\widehat v_ n(t,z)=v(t,z+c_ n)-v(t_ n,y_ n).
+\tag{48b}
+\end{equation}
+The spatial Lipschitz bound, common time modulus, and boundedness of
+$d_ n$ make these families locally uniformly bounded and
+equicontinuous.  After a subsequence they converge locally uniformly
+to $\widehat u,\widehat v$.
+
+Spatial translations and addition of constants preserve the equation.
+The usual nearby-contact argument shows that $\widehat u$ is a
+subsolution and $\widehat v$ is a strong convex supersolution.  Here
+are the two boundary cases of that stability argument.  At a singular
+upper test of $\widehat u$, add
+$\sigma|z-z_ 0|^2$, pass to nearby contacts, and then let
+$\sigma\downarrow0$.  At a positive-definite lower test of
+$\widehat v$, nearby Hessians remain positive definite.  At a
+singular positive-semidefinite lower test, temporal monotonicity,
+which also passes to the limit, directly gives
+$b\geq0=\mathcal G(Y)$.  Thus the strong formulation is closed under this
+local limit.
+
+Put $\xi_ n=d_ n/2$ and $\zeta_ n=-d_ n/2$.  Maximality in (48),
+after the normalizations (48b), says, for every fixed $t,z,w$,
+\begin{equation}
+\begin{split}
+&\widehat u_ n(t,z)-\widehat v_ n(t,w)
+-\frac{|z-w|^2}{2\epsilon}-\frac{\gamma}{S-t}\\
+&\quad\leq
+-\frac{|\xi_ n-\zeta_ n|^2}{2\epsilon}
+-\frac{\gamma}{S-t_ n}
++\eta_ n\{\chi(c_ n+z)+\chi(c_ n+w)
+-\chi(x_ n)-\chi(y_ n)\}.                         
+\end{split}
+\tag{48c}
+\end{equation}
+Because $\chi$ is $1$-Lipschitz, the absolute value of the last
+line, on compact $z,w$-sets, is at most
+\begin{equation}
+\eta_ n\{|z-\xi_ n|+|w-\zeta_ n|\}\longrightarrow0.
+\tag{48d}
+\end{equation}
+Passing to the limit, while retaining the relative quadratic, shows
+that $(t_ *,d/2,-d/2)$ is an attained global maximum of
+\begin{equation}
+\widehat u(t,z)-\widehat v(t,w)
+-\frac{|z-w|^2}{2\epsilon}-\frac{\gamma}{S-t}.
+\tag{48e}
+\end{equation}
+\smallskip\noindent
+\underline{\textit{Step 7.}} Matrix order and comparison.
+
+At the maximum in (48e), the relative quadratic is now the only
+spatial penalty.  Its Hessian vanishes when both points move by the
+same vector.  We use these directions in the doubled-variable matrix
+inequality to obtain $X\leq Y$ with no localization error.
+
+We use the doubled-variable lemma~\cite{CIL1992} in the following form.
+Apply quadratic sup-convolution to $\widehat u$ and quadratic
+inf-convolution to $\widehat v$.  The ordinary second-derivative test
+at the regularized maximum, followed by passage to closed semijets, gives
+\begin{equation}
+(a,p,X)\in\overline{\mathcal P}^{2,+}\widehat u,\qquad
+(b,p,Y)\in\overline{\mathcal P}^{2,-}\widehat v,\qquad
+a-b=\frac{\gamma}{(S-t_ *)^2}>0,
+\tag{48f}
+\end{equation}
+and, for every $\lambda>0$,
+\begin{equation}
+\begin{pmatrix}X&0\\0&-Y\end{pmatrix}
+\leq A_ \epsilon+\lambda A_ \epsilon^2,\qquad
+A_ \epsilon=\frac1\epsilon
+\begin{pmatrix}I&-I\\-I&I\end{pmatrix}.
+\tag{48g}
+\end{equation}
+The lower block bound in the same regularized second-derivative test
+keeps the approximate Hessians bounded, so (48g) survives in the
+closed semijets.  Both matrices on its right annihilate every common
+direction $(z,z)$.  Testing (48g) on such a direction gives the
+exact, error-free inequality
+\begin{equation}
+X\leq Y.
+\tag{48h}
+\end{equation}
+
+Convexity of $\widehat u(t_ *,\cdot)$ gives $X\geq0$: apply each
+approximating upper quadratic contact in opposite spatial directions
+and use nonnegativity of the convex second difference.  Hence $Y\geq0$.
+To apply the supersolution inequality to the closed lower jet, first
+suppose $Y>0$.  The approximating Hessians are then eventually positive
+definite, so the inequality passes to the limit by continuity.
+If $Y$ is singular, temporal monotonicity gives $b\geq0=\mathcal G(Y)$:
+at an ordinary lower contact, fixing the spatial point and approaching
+from earlier times gives a nonnegative time derivative, and this
+property passes to closed jets.  Since determinant is nondecreasing
+in the Loewner order on $\mathbb S_ +^2$,
+\begin{equation*}
+a\leq \mathcal G(X)\leq \mathcal G(Y)\leq b,
+\end{equation*}
+contradicting the strictly positive time-derivative gap in (48f).
+Comparison follows.  Applied to the upper and lower half-relaxed
+limits, which have the same initial trace, it shows that they agree;
+the compactness estimate then gives local uniform convergence of the
+whole sequence.
+
+\smallskip\noindent
+\underline{\textit{Step 8.}} Scaling and the value at the origin.
+
+To identify the normalization in (45), observe that the equation and
+its initial datum are invariant under
+\begin{equation*}
+U(s,q)\mapsto a^{-1}U(a^2s,aq).
+\end{equation*}
+Uniqueness therefore gives
+$U(s,q)=\sqrt s\,U(1,q/\sqrt s)$.  To obtain (45) for the prescribed
+indices $k_m$, apply the convergence just proved with
+$r_m=t_{k_m}^{(m)}$.  The two assumptions in (45) are precisely the
+conditions required for this choice of $r_m$.  Formula (43) at
+$(s,q)=(1,0)$ then gives the claimed limit $U(1,0)=\kappa$.
+
+\end{proof}
+
+\section{Completion of the Gaussian and empirical limits}\label{sec:conclusion}
+
+We now choose the scales for which the two-scale comparison can be iterated
+and the viscosity limit applied in the same sequence.  The proof keeps
+track of three requirements: few omitted levels, a negligible sum of
+comparison errors, and a vanishing time step after rescaling.
+
+\begin{lemma}[The dyadic Gaussian limit]\label{lem:dyadic-gaussian-limit}
+The dyadic Gaussian limit exists, and in the notation of Lemma~\ref{lem:viscosity-limit} it is
+\begin{equation}
+\lim_ {J\to\infty}
+\frac{\Gamma_ {2^J}}{2^J\sqrt{J\log2}}=\kappa.
+\tag{49}
+\end{equation}
+
+\end{lemma}
+
+\begin{proof}
+It suffices to approximate the Gaussian cost per unit area by the cell
+iteration with error $o(\sqrt J)$.  Suppose that we retain $m$ groups
+of $h$ levels, omit $D$ levels, and incur an error at most $e_J$ per
+unit area at each replacement.  Put $t_J=mh\log2$.  The three
+requirements are
+\begin{equation*}
+\frac{D}{J}\longrightarrow0,\qquad
+e_J=o\!\left(\frac{h}{\sqrt J}\right)
+\ \Longrightarrow\
+m e_J=o(\sqrt J),\qquad
+\frac{h}{t_J}\longrightarrow0.
+\end{equation*}
+The first allows us to restore omitted levels using (12), the second
+controls the sum of the comparison errors, and the third permits the
+viscosity limit.  We choose all parameters in the same sequence and
+then carry out these reductions.
+
+\smallskip\noindent
+\underline{\textit{Step 1.}} Choose and align the retained bands.
+
+Fix a large $J$, set
+\begin{equation*}
+h=\lfloor J^{3/4}\rfloor,\qquad b=\lceil(\log J)^2\rceil,\qquad
+S=2^{b+1},
+\end{equation*}
+and retain consecutive groups of $h$ Haar levels separated by gaps of
+$b$ omitted levels.  Omit also fewer than $h+b$ levels at the fine
+end and $h+b$ levels at the coarse end.  The total number $D$ of
+omitted levels satisfies
+\begin{equation}
+D\leq C\left(h+\frac{Jb}{h}\right)=o(J).
+\tag{50}
+\end{equation}
+The coarse-end omission ensures that, after normalizing any retained
+band $\eta_ {r,h}$ to unit outer blocks, the ambient square has side
+\begin{equation}
+R_ r=2^{J-r-h}\geq2^{h+b}.
+\tag{50a}
+\end{equation}
+When it exists, the next retained detail starts at level $r+h+b$, whose
+parent side is $2^{r+h+b+1}$.  Hence its smallest parent side in the
+active-band normalization is exactly
+\begin{equation*}
+\frac{2^{r+h+b+1}}{2^{r+h}}=2^{b+1}=S.
+\end{equation*}
+Since $h\geq1$, (50a) also shows that $S$ divides $R_r$.  Thus the
+ambient square is divisible by every auxiliary dyadic length used
+below.  Orthogonality of the Haar projections makes the active band
+independent of all bands still present.
+
+\smallskip\noindent
+\underline{\textit{Step 2.}} Make the comparison errors summable.
+
+In Lemma~\ref{lem:two-scale-scalarization} choose
+\begin{equation}
+L=S^{1/8},\qquad B=S^{3/8},\qquad A=S^{5/8},
+\qquad\varepsilon=S^{-1/32},
+\tag{51}
+\end{equation}
+rounding to compatible dyadic integers.  The parameters are chosen in
+the order
+\[
+J;\qquad h,b,S;\qquad L,B,A,\varepsilon.
+\]
+The omitted-level estimate is already (50).  To bound $e_J$ uniformly
+throughout the iteration, we check both the geometry and the sizes of
+the profiles in \eqref{eq:two-scale-scalarization}.  The geometric
+slack required in (23a) is
+\begin{equation*}
+L+\frac{B^2}{A}\asymp S^{1/8}
+\ll S^{11/32}=\varepsilon B.
+\end{equation*}
+
+The geometric loss satisfies $\delta\leq CS^{-1/32}$.
+The concentration error is $O(\sqrt{\log S}\,S^{-1/16})$.
+Since $S=2^{b+1}$ grows faster than any power of $J$, it remains to
+bound the other factors polynomially in $J$, uniformly in the step.
+If
+$\Phi_ 0=|\cdot|$ and
+$\Phi_ {k+1}=\mathcal H_ {h,L}\Phi_ k$, the construction behind (46)
+gives
+\begin{equation}
+\Phi_ k(p)\leq\mathbb E|p+Z_ 1+\cdots+Z_ k|
+\leq |p|+C\sqrt{kh};
+\tag{52}
+\end{equation}
+hence the height parameter $M$ in (13) is $O(\sqrt J)$.
+For the normalized retained band at level $r$, the canonical coarse flux
+gives, uniformly in the step,
+\begin{equation}
+|Q_{R_r}|^{-1}\mathbb EJ_ {\mathcal H_ {h,L}\Phi_ k}^{Q_{R_r}}(\zeta)
+\leq\mathbb E\fint_{Q_{R_r}}\bigl(|P|+C\sqrt J\bigr)\leq C\sqrt J.
+\tag{52a}
+\end{equation}
+Inserting these bounds into \eqref{eq:two-scale-scalarization} gives
+the required uniform estimate
+\begin{equation}
+e_ J\leq C\sqrt J\,S^{-1/32}
++C\sqrt{\log S}\,S^{-1/16}=o(h/\sqrt J).
+\tag{52b}
+\end{equation}
+Since $m\leq J/h$, the second error budget is now verified:
+\begin{equation*}
+m e_J\leq\frac{J}{h}\,
+o\!\left(\frac{h}{\sqrt J}\right)=o(\sqrt J).
+\end{equation*}
+Together with $\varepsilon L=S^{3/32}\to\infty$, the displayed slack
+verifies the geometric conditions (23a).
+All iterated profiles are $D_ 4$-invariant by Proposition~\ref{prop:cell-operator-properties}, so the reflected bounded-square proof applies.
+
+\smallskip\noindent
+\underline{\textit{Step 3.}} Remove the retained bands and evaluate the terminal cost.
+
+Apply \eqref{eq:two-scale-scalarization}, successively, from the finest retained band to the coarsest.
+There are $m\leq J/h$ applications, so their total error per unit
+area is at most $me_ J=o(\sqrt J)$.  In dimension two the rescaling
+from a band of outer side $2^{r+h}$ changes both total energy and area
+by the same factor $2^{2(r+h)}$, so \eqref{eq:two-scale-scalarization} is an error per original unit
+area with no additional scale factor.  Formula (50a) provides exact
+boundary alignment at every application.  For the last band the same argument is used
+with $\zeta=0$.  After the last replacement no random source remains.
+For a divergence-free zero-normal field $v$ on a square,
+\begin{equation*}
+\int v_ i=\int\operatorname {div}(x_ i v)=0;
+\end{equation*}
+therefore Jensen's inequality, with equality for $v=0$, says that the
+terminal energy is exactly
+$|Q_{2^J}|\Phi_m(0)=2^{2J}\Phi_m(0)$.  Consequently, if
+$\rho_{2^J}^{\rm ret}$ is the retained source in $Q_ {2^J}$,
+\begin{equation}
+2^{-2J}\mathbb E\|\rho_{2^J}^{\rm ret}\|_ {\rm KR}
+=\Phi_ m(0)+o(\sqrt J).
+\tag{53}
+\end{equation}
+
+\smallskip\noindent
+\underline{\textit{Step 4.}} Apply the viscosity limit and restore the omitted bands.
+
+The retained logarithmic time is
+\begin{equation}
+t_ J=mh\log2=(J-D)\log2=J\log2+o(J).
+\tag{54}
+\end{equation}
+In particular,
+\begin{equation*}
+t_J\sim J\log2,\qquad
+\frac{h}{t_J}\longrightarrow0,\qquad L=S^{1/8}\longrightarrow\infty.
+\end{equation*}
+This verifies the final error budget and precisely the joint limit regime
+required by Lemma~\ref{lem:viscosity-limit}.
+
+Apply Lemma~\ref{lem:viscosity-limit} with triangular row index $J$,
+$h_J=h$, $L_J=L$, $r_J=t_J$, $F_k^{(J)}=\Phi_k$, and iteration index
+$k_J=m$.  Then $t_{k_J}^{(J)}=t_J$, and (54) verifies the hypotheses
+of (45).  Hence $\Phi_m(0)/\sqrt{t_J}\to\kappa$.  On the other hand,
+(12) and (50) give
+\begin{equation}
+\mathbb E\|\rho_{2^J}-\rho_{2^J}^{\rm ret}\|_ {\rm KR}
+\leq C2^{2J}\sqrt D=o(2^{2J}\sqrt J).
+\tag{55}
+\end{equation}
+Combining (53)--(55),
+\begin{equation}
+\frac{\mathbb E\|\rho_{2^J}\|_ {\rm KR,Q_ {2^J}}}
+{2^{2J}\sqrt{J\log2}}\longrightarrow\kappa.
+\tag{56}
+\end{equation}
+Finally (9) is $o(2^{2J}\sqrt J)$, and
+$\widehat\Gamma_ {2^J}=2^J\Gamma_ {2^J}$.  Equation (56) is therefore
+equivalent to (49), which proves the lemma.
+
+\end{proof}
+
+\begin{samepage}
+\begin{proof}[Proof of Theorem~\ref{thm:intro-main}]
+The dyadic limit in (6) equals $\kappa$ by
+Lemma~\ref{lem:dyadic-gaussian-limit}.  The approximation in
+Lemma~\ref{lem:gaussianization-dyadic} therefore gives, for the full
+sequence of integers $N$,
+\begin{equation*}
+\lim_ {N\to\infty}\frac1{\sqrt{N\log N}}
+\mathbb E\sup_ {\Lip(f)\leq1}
+\left|\sum_ {i=1}^N\left(f(X_ i)-\int f\,d\lambda\right)\right|
+=\frac\kappa{\sqrt2}.
+\end{equation*}
+By Lemma~\ref{lem:viscosity-limit}, $\kappa=U(1,0)$.  The AKT bounds
+recalled in the introduction show that this limit is finite and positive,
+which proves every assertion of the theorem.
+
+\end{proof}
+
+\end{samepage}
+
+\section*{Acknowledgement}
+
+H.M. is supported in part by a Lady Davis Fellowship at the Technion.
+The initial proof idea was developed by OpenAI's GPT-5.6 sol and
+Rethlas proof agent.
+
+\begingroup
+\raggedright
+\bibliographystyle{alpha}
+\bibliography{biblio}
+\endgroup
+
+\end{document}
